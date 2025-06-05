@@ -1,0 +1,13 @@
+{
+    "1378972162165309460": {
+        "notifications": {
+            "ranked": true,
+            "custom": {
+                "anarking": {
+                    "map": "Anarking",
+                    "enabled": true
+                }
+            }
+        }
+    }
+}
