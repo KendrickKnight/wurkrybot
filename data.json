@@ -1,5 +1,14 @@
 {
     "searching": false,
-    "lobbies": [],
-    "connection": false
+    "lobbies": [
+        {
+            "name": "Raid Wars Classic ",
+            "host": "guest_658335",
+            "map": "Raid Wars Classic",
+            "player_count": "[1/2]",
+            "running": false,
+            "locked": true
+        }
+    ],
+    "connection": true
 }
