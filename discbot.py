@@ -6,6 +6,7 @@ import os
 from time import sleep
 import json
 import sys
+import subprocess
 
 import msg_funcs as msf
 
@@ -42,7 +43,7 @@ async def on_guild_join(guild):
             json.dump(server_settings, ss, indent=4)
 
 @commands.has_permissions(administrator=True)
-@bot.command()
+@bot.command(help="[Admin] () if server has no settings file, adds it for that server")
 async def add_server_setting(ctx):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
@@ -57,12 +58,42 @@ async def add_server_setting(ctx):
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings, ss, indent=4)
 
+# ---------------------------------------------------------------------------- #
+#                             Scraper Bot Handling                             #
+# ---------------------------------------------------------------------------- #
+
+reporter_process = None
+
+@commands.has_permissions(administrator=True)
+@bot.command(help = "[Admin] () Start the scraper")
+async def reporter_start(ctx):
+    global reporter_process
+    if reporter_process is None:
+        reporter_process = subprocess.Popen(['python', 'reporter.py'])
+        await ctx.send("Reporter reporting for duty!.")
+    else:
+        await ctx.send("Reporter already reporting!.")
+
+
+@commands.has_permissions(administrator=True)
+@bot.command(help = "[Admin] () Stop the scraper")
+async def reporter_stop(ctx):
+    global reporter_process
+    if reporter_process:
+        reporter_process.terminate()
+        reporter_process = None
+        await ctx.send("Reporter dismissed.")
+    else:
+        await ctx.send("Reporter is already offduty.")
+
+
+
 
 # ---------------------------------------------------------------------------- #
 #                         Lobby and Monitoring Cmmands                         #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "Shows all lobbies at this singular moment")
+@bot.command(help = "[Member] () Shows all lobbies at this singular moment")
 async def lobby(ctx):
     with open("server_settings.json", "r") as ss:
         server_setting = json.load(ss)
@@ -73,7 +104,7 @@ async def lobby(ctx):
 
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] deletes all messages in a channel, & continuously monitors lwg lobbies")
+@bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
 async def lobby_start(ctx):
  
     #Initial channel clear and message
@@ -105,6 +136,7 @@ async def lobby_start(ctx):
         with open('data.json', 'r') as dataFile:
             data = json.load(dataFile)
             messages = [msg async for msg in ctx.channel.history(limit=50)]
+            
             
             if stop_monitor:
                 await ctx.send("Monitoring Stopped!", view=None)
@@ -167,7 +199,7 @@ async def lobby_start(ctx):
         sleep(2)
     
 @commands.has_permissions(administrator=True)
-@bot.command(help="[Admin] stops !start_monitoring command")
+@bot.command(help="[Admin] () stops !lobby_start command")
 async def lobby_stop(ctx):
     global stop_monitor
     stop_monitor =  True
@@ -176,27 +208,31 @@ async def lobby_stop(ctx):
 #                                 Bot Commands                                 #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "Says hi :D")
+@bot.command(help = "[Member] () Says hi :D")
 async def hi(ctx):
     await ctx.send(f"Hello {ctx.author.mention}!")
 
 @commands.has_permissions(manage_messages=True)
-@bot.command(help = "[Admin] clears all messages sent in the past 14 days")
+@bot.command(help = "[Admin] () clears all messages sent in the past 14 days")
 async def bot_clear_all(ctx):
     def check(msg):
         return True  # All messages
     await ctx.channel.purge(limit=None, check=check, bulk=True)
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] shuts the bot down")
+@bot.command(help = "[Admin] () shuts the bot down")
 async def bot_shutdown(ctx):
+    global reporter_process
     lobby_stop(ctx)
+    if reporter_process:
+        reporter_process.terminate()
+        reporter_process = None
     await ctx.send("Shutting down...")
     await bot.close()
     sys.exit()  # Optional: exits Python process
     
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] Restarts the bot")
+@bot.command(help = "[Admin] () Restarts the bot")
 async def bot_restart(ctx):
     lobby_stop(ctx)
     await ctx.send("Restarting...")
@@ -207,7 +243,7 @@ async def bot_restart(ctx):
 #                                 Role Commands                                #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "Give yourself a map role if it exist")
+@bot.command(help = "[Member] (role_name) Give yourself a map role if it exist")
 async def role_get(ctx, role_name):
     with open("server_settings.json", "r") as ss:
         ss = json.load(ss)
@@ -225,7 +261,7 @@ async def role_get(ctx, role_name):
 
 
 
-@bot.command(help = "remove a role you have")
+@bot.command(help = "[Member] (role_name) remove a role you have")
 async def role_remove(ctx, role_name):
     with open("server_settings.json", "r") as ss:
         ss = json.load(ss)
@@ -236,7 +272,7 @@ async def role_remove(ctx, role_name):
         if role_name.lower() != "ranked" and role_name.lower() not in server_settings.keys():
             await ctx.send("i cant find this role. CHECK YOUR SPELLING SWINE!")
         elif role in ctx.author.roles:
-            await ctx.author.add_roles(role)
+            await ctx.author.remove_roles(role)
             await ctx.send(f"Very well {ctx.author.mention}! your {role} role has been removed!")
         else:
             await ctx.send(f"Sry {ctx.author.mention}, You dont have this role :(")
@@ -248,7 +284,7 @@ async def role_remove(ctx, role_name):
 # ---------------------------------------------------------------------------- #
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] Enable/Disable rank notification")
+@bot.command(help = "[Admin] () Enable/Disable rank notification")
 async def notif_ranked(ctx):
     with open("server_settings.json","r") as ss:
         server_setting = json.load(ss)
@@ -265,7 +301,7 @@ async def notif_ranked(ctx):
         json.dump(server_setting, ss, indent=4)
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] Enable/Disable rank notification")
+@bot.command(help = "[Admin] (role_name) Enable/Disable rank notification")
 async def notif_custom(ctx, role):
     with open("server_settings.json","r") as ss:
         server_setting = json.load(ss)
@@ -288,7 +324,7 @@ async def notif_custom(ctx, role):
 #                                Filter Commands                               #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "displays a list of filters.")
+@bot.command(help = "[Member] () displays a list of filters.")
 async def filter_view(ctx):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
@@ -296,7 +332,7 @@ async def filter_view(ctx):
         await ctx.send("".join(list(f"> {i}: {server_roles[i]} \n" for i in server_roles)))
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] add a new filter.")
+@bot.command(help = "[Admin] (role_name, map_name) add a new filter.")
 async def filter_add(ctx, role, map_name):
     with open("server_settings.json","r") as ss:
         server_set = json.load(ss)
@@ -304,18 +340,25 @@ async def filter_add(ctx, role, map_name):
     setting_custom[role] = dict(map = map_name ,enabled=False)
     with open("server_settings.json","w") as ss2:
         json.dump(server_set, ss2, indent=4)
-    await ctx.send(f"{role} role is added. \n Current filters:")
+    await ctx.send(f"{role} filter is added. \n Current filters:")
     await filter_view(ctx)
 
 
-@commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin][WIP] edit a filters.")
-async def filter_edit(ctx, old_role, new_role, new_map):
-    await filter_view(ctx)
-    pass
+# @commands.has_permissions(administrator=True)
+# @bot.command(help = "[Admin] (old_role, new_role, new_map) edit a filters.")
+# async def filter_edit(ctx, old_role, new_role, new_map):
+#     with open("server_settings.json", "r") as ss:
+#         server_settings = json.load(ss)
+#         server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(old_role)
+#         setting_custom[new_role] = dict(map = new_map ,enabled=False)
+#     with open("server_settings.json","w") as ss2:
+#         json.dump(server_set, ss2, indent=4)
+#     await ctx.send(f"It is done")
+#     await filter_view(ctx)
+
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] removes a filter.")
+@bot.command(help = "[Admin] (role_name) removes a filter.")
 async def filter_remove(ctx, role):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
@@ -324,11 +367,9 @@ async def filter_remove(ctx, role):
     with open("server_settings.json", "w") as ss:
         json.dump(server_settings,ss, indent=4)
     
-    await ctx.send(f"{role} role is removed. \n Current filters:")
+    await ctx.send(f"{role} filter is removed. \n Current filters:")
     await filter_view(ctx)
     
-        
-
 
 def main():
     bot.run(token, log_handler=handler, log_level=logging.DEBUG)

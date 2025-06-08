@@ -41,9 +41,15 @@ async def lobby_report(data, setting):
 
 async def monitor_report(data, ranked, setting):
 
+    connection_text = "**Reporter Status:**"
     ranked_text = "**Ranked** \n"
     lobby_text = "\n **Lobbies:** \n"
     customs_text = ""
+
+    if data["connection"]:
+        connection_text += " :green_circle: \n"
+    else:
+        connection_text += " :red_circle: \n"
 
     if data["searching"] == True:
         ranked_text += f"{ranked.mention} `Someone's Searching!` \n"
@@ -66,7 +72,7 @@ async def monitor_report(data, ranked, setting):
         else: lobby_text += f"\n > {i["name"]} {i["player_count"]}{emoji_running if i["running"]==True else ""}{emoji_lock if i["locked"]==True else ""}"
                 
     
-    text = ranked_text + lobby_text + customs_text
+    text = connection_text + ranked_text + lobby_text + customs_text
 
     return text, link_button_view()
 

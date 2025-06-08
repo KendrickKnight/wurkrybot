@@ -1,29 +1,5 @@
 {
     "searching": false,
-    "lobbies": [
-        {
-            "name": "Mountain Ridge",
-            "host": "Sphinex",
-            "map": "Mountain Ridge",
-            "player_count": "[6/6] ",
-            "running": true,
-            "locked": false
-        },
-        {
-            "name": "Raid Wars Classic ",
-            "host": "guest_306487",
-            "map": "Raid Wars Classic",
-            "player_count": "[1/2]",
-            "running": false,
-            "locked": false
-        },
-        {
-            "name": "Anarking",
-            "host": "guest_306487",
-            "map": "Anarking",
-            "player_count": "[1/2]",
-            "running": false,
-            "locked": false
-        }
-    ]
+    "lobbies": [],
+    "connection": false
 }
