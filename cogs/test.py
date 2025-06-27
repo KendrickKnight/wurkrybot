@@ -11,4 +11,4 @@ class Test(commands.Cog):
     
 
 async def setup(bot):
-    bot.add_cog(Test(bot))
+    await bot.add_cog(Test(bot))
