@@ -33,7 +33,7 @@ async def on_ready():
     print(f'{bot.user.name} is ready to rumble!')
 
 @bot.event
-async def on_guild_join(guild):
+async def on_guild_join(ctx, guild):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
     
@@ -46,6 +46,9 @@ async def on_guild_join(guild):
             }
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings, ss, indent=4)
+
+
+bot.load_extension("cogs/testcog.py")
 
 @commands.has_permissions(administrator=True)
 @bot.command(help="[Admin] () if server has no settings file, adds it for that server")
