@@ -22,14 +22,18 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
 
 stop_monitor = False
 rank_notice = True
 
+# ---- use only ONE bot instance ----
 class MyBot(commands.Bot):
     async def setup_hook(self):
-        await self.load_extension(f"cogs.test")
+        # if your file is cogs/testcog.py use "cogs.testcog"
+        await self.load_extension("cogs.testcog")
+
+bot = MyBot(command_prefix="!", intents=intents)   # ← reused everywhere below
+# -----------------------------------
 
 @bot.event
 async def on_ready():
