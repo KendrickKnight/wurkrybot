@@ -29,10 +29,7 @@ rank_notice = True
 
 class MyBot(commands.Bot):
     async def setup_hook(self):
-        await self.load_extension(f"cogs.testcog")
-
-for file in os.listdir("cogs"):
-    bot.load_extension(f"cogs.{file.capitalize()}")
+        await self.load_extension(f"cogs.test")
 
 @bot.event
 async def on_ready():
