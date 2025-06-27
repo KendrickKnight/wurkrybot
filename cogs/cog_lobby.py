@@ -61,12 +61,12 @@ class Lobby(commands.Cog):
 
                 # Makes sure that only 2 messages are in the channel: role giver and lobby_monitor
                 for i in range(len(messages)):
-                    if messages[i].author != commands.user:
+                    if messages[i].author != bot.user:
                         await messages[i].delete()
-                    elif messages[i].author == commands.user and i != 0:
+                    elif messages[i].author == bot.user and i != 0:
                         await messages[i].delete()
                         
-                if messages[-1].author != commands.user:
+                if messages[-1].author != bot.user:
                     await messages[-1].delete()
                 else:
                     text, view = await msf.monitor_report(data, role_ranked, guild_setting)
@@ -78,8 +78,8 @@ class Lobby(commands.Cog):
                 if guild_setting["notifications"]["ranked"] == True:
                     if data["searching"] == True and last_ranked_search_status == False:
                         last_ranked_search_status = True
-                        commands.ranked_notice_message = await ctx.send(f"{role_ranked.mention}")
-                        await commands.ranked_notice_message.delete()
+                        bot.ranked_notice_message = await ctx.send(f"{role_ranked.mention}")
+                        await bot.ranked_notice_message.delete()
                     elif data["searching"] == False:
                         last_ranked_search_status = False
                         
@@ -103,8 +103,8 @@ class Lobby(commands.Cog):
                 for i in guild_setting["notifications"]["custom"]:
                     if notif_list[notif_list_count] == True and notif_list_setting[notif_list_count] == False:
                         notif_list_setting[notif_list_count] = True
-                        commands.ranked_notice_message = await ctx.send(f"{discord.utils.get(ctx.guild.roles, name = i).mention}")
-                        await commands.ranked_notice_message.delete()
+                        bot.ranked_notice_message = await ctx.send(f"{discord.utils.get(ctx.guild.roles, name = i).mention}")
+                        await bot.ranked_notice_message.delete()
                     elif notif_list[notif_list_count] == False:
                         notif_list_setting[notif_list_count] = False
                     notif_list_count += 1
