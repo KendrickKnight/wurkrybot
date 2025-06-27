@@ -27,6 +27,9 @@ bot = commands.Bot(command_prefix='!', intents=intents)
 stop_monitor = False
 rank_notice = True
 
+class MyBot(commands.Bot):
+    async def setup_hook(self):
+        await self.load_extension("cogs.testcog")
 
 @bot.event
 async def on_ready():
@@ -379,8 +382,7 @@ async def filter_remove(ctx, role):
     await filter_view(ctx)
     
 
-async def main():
-    await bot.load_extension("cogs.testcog")
-    await bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+def main():
+    bot.run(token, log_handler=handler, log_level=logging.DEBUG)
 
 main()
