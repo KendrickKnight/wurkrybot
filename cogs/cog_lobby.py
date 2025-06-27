@@ -11,9 +11,9 @@ class Lobby(commands.Cog):
     
     @commands.command(help = "[Member] () Shows all lobbies at this singular moment")
     async def lobby(self, ctx):
-        with open("../server_settings.json", "r") as ss:
+        with open("server_settings.json", "r") as ss:
             server_setting = json.load(ss)
-        with open("../data.json", 'r') as dataFile:
+        with open("data.json", 'r') as dataFile:
             data = json.load(dataFile)
             text, view = await msf.lobby_report(data["lobbies"],server_setting[str(ctx.guild.id)])
             await ctx.send(text,view=view)
@@ -33,7 +33,7 @@ class Lobby(commands.Cog):
 
         role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
 
-        with open("../server_settings.json", "r") as settingfile:
+        with open("server_settings.json", "r") as settingfile:
             setting = json.load(settingfile)
             guild_setting = setting[str(ctx.guild.id)]
 
