@@ -10,7 +10,7 @@ class Lobby(commands.Cog):
         self.bot = bot
     
     @commands.command(help = "[Member] () Shows all lobbies at this singular moment")
-    async def lobby(ctx):
+    async def lobby(self, ctx):
         with open("../server_settings.json", "r") as ss:
             server_setting = json.load(ss)
         with open("../data.json", 'r') as dataFile:
@@ -21,7 +21,7 @@ class Lobby(commands.Cog):
 
     @commands.has_permissions(administrator=True)
     @commands.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
-    async def lobby_start(ctx):
+    async def lobby_start(self, ctx):
     
         #Initial channel clear and message
         def check(msg):
@@ -61,12 +61,12 @@ class Lobby(commands.Cog):
 
                 # Makes sure that only 2 messages are in the channel: role giver and lobby_monitor
                 for i in range(len(messages)):
-                    if messages[i].author != bot.user:
+                    if messages[i].author != self.bot.user:
                         await messages[i].delete()
-                    elif messages[i].author == bot.user and i != 0:
+                    elif messages[i].author == self.bot.user and i != 0:
                         await messages[i].delete()
                         
-                if messages[-1].author != bot.user:
+                if messages[-1].author != self.bot.user:
                     await messages[-1].delete()
                 else:
                     text, view = await msf.monitor_report(data, role_ranked, guild_setting)
@@ -78,8 +78,8 @@ class Lobby(commands.Cog):
                 if guild_setting["notifications"]["ranked"] == True:
                     if data["searching"] == True and last_ranked_search_status == False:
                         last_ranked_search_status = True
-                        bot.ranked_notice_message = await ctx.send(f"{role_ranked.mention}")
-                        await bot.ranked_notice_message.delete()
+                        self.bot.ranked_notice_message = await ctx.send(f"{role_ranked.mention}")
+                        await self.bot.ranked_notice_message.delete()
                     elif data["searching"] == False:
                         last_ranked_search_status = False
                         
@@ -103,8 +103,8 @@ class Lobby(commands.Cog):
                 for i in guild_setting["notifications"]["custom"]:
                     if notif_list[notif_list_count] == True and notif_list_setting[notif_list_count] == False:
                         notif_list_setting[notif_list_count] = True
-                        bot.ranked_notice_message = await ctx.send(f"{discord.utils.get(ctx.guild.roles, name = i).mention}")
-                        await bot.ranked_notice_message.delete()
+                        self.bot.ranked_notice_message = await ctx.send(f"{discord.utils.get(ctx.guild.roles, name = i).mention}")
+                        await self.bot.ranked_notice_message.delete()
                     elif notif_list[notif_list_count] == False:
                         notif_list_setting[notif_list_count] = False
                     notif_list_count += 1
@@ -116,7 +116,7 @@ class Lobby(commands.Cog):
         
     @commands.has_permissions(administrator=True)
     @commands.command(help="[Admin] () stops !lobby_start command")
-    async def lobby_stop(ctx):
+    async def lobby_stop(self, ctx):
         global stop_monitor
         stop_monitor =  True
 
