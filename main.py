@@ -48,7 +48,7 @@ async def on_guild_join(ctx, guild):
             json.dump(server_settings, ss, indent=4)
 
 
-bot.load_extension("cogs.testcog")
+
 
 @commands.has_permissions(administrator=True)
 @bot.command(help="[Admin] () if server has no settings file, adds it for that server")
@@ -379,7 +379,8 @@ async def filter_remove(ctx, role):
     await filter_view(ctx)
     
 
-def main():
-    bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+async def main():
+    await bot.load_extension("cogs.testcog")
+    await bot.run(token, log_handler=handler, log_level=logging.DEBUG)
 
 main()
