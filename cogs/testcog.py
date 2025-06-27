@@ -1,6 +1,6 @@
 from discord.ext import commands
 
-class Test(commands.cog):
+class Test(commands.Cog):
     
     def __init__(self, bot):
         self.bot = bot
@@ -10,5 +10,5 @@ class Test(commands.cog):
         await ctx.send(f"IM HIT! the cog also works btw.")
     
 
-def setup(bot):
+async def setup(bot):
     bot.add_cog(Test(bot))
