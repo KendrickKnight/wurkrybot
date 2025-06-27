@@ -29,8 +29,8 @@ rank_notice = True
 # ---- use only ONE bot instance ----
 class MyBot(commands.Bot):
     async def setup_hook(self):
-        # if your file is cogs/testcog.py use "cogs.testcog"
         await self.load_extension("cogs.test")
+        await self.load_extension("cogs.cog_lobby")
 
 bot = MyBot(command_prefix="!", intents=intents)   # ← reused everywhere below
 # -----------------------------------
