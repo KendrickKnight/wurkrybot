@@ -22,7 +22,6 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
 intents = discord.Intents.default()
 intents.message_content = True
 
-
 stop_monitor = False
 rank_notice = True
 
@@ -343,25 +342,30 @@ async def notif_custom(ctx, role):
 
 @bot.command(help = "[Member] () displays a list of filters.")
 async def filter_view(ctx):
-    with open("server_settings.json", "r") as ss:
-        server_settings = json.load(ss)
-        server_roles = server_settings[str(ctx.guild.id)]["notifications"]["custom"]
-        await ctx.send("".join(list(f"> {i}: {server_roles[i]} \n" for i in server_roles)))
+    try:
+        with open("server_settings.json", "r") as ss:
+            server_settings = json.load(ss)
+            server_roles = server_settings[str(ctx.guild.id)]["notifications"]["custom"]
+            await ctx.send("".join(list(f"> {i}: {server_roles[i]} \n" for i in server_roles)))
+    except Exception as e:
+        await ctx.send(f"Something went wrong: `{e}`")
 
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] (role_name, map_name) add a new filter.")
 async def filter_add(ctx, role, map_name):
-    with open("server_settings.json","r") as ss:
-        server_set = json.load(ss)
-    setting_custom = server_set[str(ctx.guild.id)]["notifications"]["custom"]
-    setting_custom[role] = dict(map = map_name ,enabled=False)
-    with open("server_settings.json","w") as ss2:
-        json.dump(server_set, ss2, indent=4)
-    guild = ctx.guild
-    await guild.create_role(name=role)
-    await ctx.send(f"{role} filter is added. \n Current filters:")
-    await filter_view(ctx)
-
+    try:
+        with open("server_settings.json","r") as ss:
+            server_set = json.load(ss)
+        setting_custom = server_set[str(ctx.guild.id)]["notifications"]["custom"]
+        setting_custom[role] = dict(map = map_name ,enabled=False)
+        with open("server_settings.json","w") as ss2:
+            json.dump(server_set, ss2, indent=4)
+        guild = ctx.guild
+        await guild.create_role(name=role)
+        await ctx.send(f"{role} filter is added. \n Current filters:")
+        await filter_view(ctx)
+    except Exception as e:
+        await ctx.send(f"Something went wrong: `{e}`")
 
 # @commands.has_permissions(administrator=True)
 # @bot.command(help = "[Admin] (old_role, new_role, new_map) edit a filters.")
@@ -379,22 +383,25 @@ async def filter_add(ctx, role, map_name):
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] (role_name) removes a filter.")
 async def filter_remove(ctx, role):
-    with open("server_settings.json", "r") as ss:
-        server_settings = json.load(ss)
-        server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role)
-    
-    with open("server_settings.json", "w") as ss:
-        json.dump(server_settings,ss, indent=4)
     try:
-        await role.delete()
-        await ctx.send(f"Role `{role.name}` has been deleted.")
-    except discord.Forbidden:
-        await ctx.send("I don't have permission to delete that role.")
-    except discord.HTTPException as e:
-        await ctx.send(f"Failed to delete role: {e}")
+        with open("server_settings.json", "r") as ss:
+            server_settings = json.load(ss)
+            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role)
+        
+        with open("server_settings.json", "w") as ss:
+            json.dump(server_settings,ss, indent=4)
+        try:
+            await role.delete()
+            await ctx.send(f"Role `{role.name}` has been deleted.")
+        except discord.Forbidden:
+            await ctx.send("I don't have permission to delete that role.")
+        except discord.HTTPException as e:
+            await ctx.send(f"Failed to delete role: {e}")
 
-    await ctx.send(f"{role} filter is removed. \n Current filters:")
-    await filter_view(ctx)
+        await ctx.send(f"{role} filter is removed. \n Current filters:")
+        await filter_view(ctx)
+    except Exception as e:
+        await ctx.send(f"Something went wrong: `{e}`")
     
 
 def main():
