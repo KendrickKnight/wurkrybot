@@ -382,16 +382,21 @@ async def filter_add(ctx, role, map_name):
 
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] (role_name) removes a filter.")
-async def filter_remove(ctx, role: discord.Role):
+async def filter_remove(ctx, role):
     try:
         with open("server_settings.json", "r") as ss:
             server_settings = json.load(ss)
-            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role.name)
+            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role)
         
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings,ss, indent=4)
         try:
-            await role.delete()
+            role_obj = discord.utils.get(ctx.guild.roles, name=role)
+            if role_obj is not None:
+                await role_obj.delete()
+                await ctx.send(f"Role `{role}` has been deleted.")
+            else:
+                await ctx.send(f"Role `{role}` not found.")
             await ctx.send(f"Role `{role.name}` has been deleted.")
         except discord.Forbidden:
             await ctx.send("I don't have permission to delete that role.")
