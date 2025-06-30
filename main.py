@@ -357,6 +357,8 @@ async def filter_add(ctx, role, map_name):
     setting_custom[role] = dict(map = map_name ,enabled=False)
     with open("server_settings.json","w") as ss2:
         json.dump(server_set, ss2, indent=4)
+    guild = ctx.guild
+    await guild.create_role(name=role)
     await ctx.send(f"{role} filter is added. \n Current filters:")
     await filter_view(ctx)
 
@@ -383,7 +385,14 @@ async def filter_remove(ctx, role):
     
     with open("server_settings.json", "w") as ss:
         json.dump(server_settings,ss, indent=4)
-    
+    try:
+        await role.delete()
+        await ctx.send(f"Role `{role.name}` has been deleted.")
+    except discord.Forbidden:
+        await ctx.send("I don't have permission to delete that role.")
+    except discord.HTTPException as e:
+        await ctx.send(f"Failed to delete role: {e}")
+
     await ctx.send(f"{role} filter is removed. \n Current filters:")
     await filter_view(ctx)
     
