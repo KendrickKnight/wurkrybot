@@ -386,7 +386,7 @@ async def filter_remove(ctx, role: discord.Role):
     try:
         with open("server_settings.json", "r") as ss:
             server_settings = json.load(ss)
-            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role)
+            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role.name)
         
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings,ss, indent=4)
