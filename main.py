@@ -35,7 +35,7 @@ rank_notice = True
 # bot = MyBot(command_prefix="!", intents=intents)   # ← reused everywhere below
 # -----------------------------------
 
-bot = commands.Bot(command_prefix="!")
+bot = commands.Bot(command_prefix='!', intents=intents)
 
 @bot.event
 async def on_ready():
