@@ -382,7 +382,7 @@ async def filter_add(ctx, role, map_name):
 
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] (role_name) removes a filter.")
-async def filter_remove(ctx, role):
+async def filter_remove(ctx, role: discord.Role):
     try:
         with open("server_settings.json", "r") as ss:
             server_settings = json.load(ss)
