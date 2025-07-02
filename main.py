@@ -134,8 +134,8 @@ async def lst(ctx):
 
     # send messages
 
-    msg_role = await ctx.send(msf.role_report)
-    msg_lobbies = await ctx.send(msf.lobby_report)
+    msg_role = await ctx.send(msf.role_report())
+    msg_lobbies = await ctx.send(msf.lobby_report())
 
 
 @commands.has_permissions(administrator=True)
