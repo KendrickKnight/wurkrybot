@@ -124,10 +124,13 @@ async def lst(ctx):
     
     with open('server_settings.json', 'r') as ss:
         data_settings = json.load(ss)
+        guild_dettings = data_settings[str(ctx.guild.id)]
 
     with open("data.json", 'r') as dataFile:
         data_lobbies = json.load(dataFile)
     
+    role_embed, roles_dictionary = msf.role_report(guild_dettings)
+
     # Purge the channel
     # try:
     #     def check(msg):
@@ -136,12 +139,14 @@ async def lst(ctx):
     # except Exception as e:
     #     await ctx.send(f"error: \n{e}")
 
-    # messages
+    # Initial messages
     try:
-        msg_role = await ctx.send(msf.role_report(data_settings))
+        msg_role = await ctx.send(embed=role_embed)
+        for i in roles_dictionary.keys():
+            await msg_role.add_reaction(i)
     except Exception as e:
-        await ctx.send(f"Error \n{e}")
-    
+        await ctx.send(f"Error \n{e}")  
+
 
 
 @commands.has_permissions(administrator=True)

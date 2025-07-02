@@ -21,8 +21,10 @@ def link_button_view():
  
 def role_report(setting):
     roles_text = ":zero: Ranked"
+    roles_dictionary = {}
     for i in len(setting["notifications"]["custom"]):
         text += (f"\n{emoji_roles[i]}  {setting["notifications"]["custom"].keys()[i]}")
+        roles_dictionary[str(emoji_roles[i])] = str(setting["notifications"]["custom"].keys()[i])
     
     role_embed = discord.Embed(
         title="Roles",
@@ -31,7 +33,7 @@ def role_report(setting):
     )
     role_embed.add_field(name=" ",value=roles_text)
     
-    return role_embed
+    return role_embed, roles_dictionary
 
 async def lobby_report(data, setting):
         # Generating message text
