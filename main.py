@@ -137,7 +137,10 @@ async def lst(ctx):
     #     await ctx.send(f"error: \n{e}")
 
     # messages
-    msg_role = await ctx.send(msf.role_report(data_settings))
+    try:
+        msg_role = await ctx.send(msf.role_report(data_settings))
+    except Exception as e:
+        await ctx.send(f"Error \n{e}")
 
 
 
