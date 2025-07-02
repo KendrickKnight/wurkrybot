@@ -124,12 +124,33 @@ async def lst(ctx):
     
     with open('server_settings.json', 'r') as ss:
         data_settings = json.load(ss)
-        guild_dettings = data_settings[str(ctx.guild.id)]
+        guild_settings = data_settings[str(ctx.guild.id)]
 
     with open("data.json", 'r') as dataFile:
         data_lobbies = json.load(dataFile)
     
-    role_embed, roles_dictionary = msf.role_report(guild_dettings)
+    role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
+
+
+    async def update_embed_role(msg_id, guild_settings):
+
+        embed_role, dict_roles = msf.role_report(guild_settings)
+
+        # Update embed
+        msg_id.edit(embed = embed_role)
+
+        # Add reactions
+            #TODO: check if the bot already has added a certain reaction
+        for i in dict_roles.keys():
+            await msg_id.add_reaction(i)
+
+    async def update_embed_lobbies(msg_id, data, role_ranked, guild_settings):
+        text, view = await msf.monitor_report(data, role_ranked, guild_settings)
+        await msg_id.edit(content=text ,view=view)
+    
+    async def update_notif():
+        pass
+
 
     # Purge the channel
     # try:
@@ -140,16 +161,24 @@ async def lst(ctx):
     #     await ctx.send(f"error: \n{e}")
 
     # Initial messages
-    try:
         # Role message
-        msg_role = await ctx.send(embed=role_embed)
-        for i in roles_dictionary.keys():
-            await msg_role.add_reaction(i)
-        
+    msg_role = await ctx.send("")
         # Lobby Message
-    except Exception as e:
-        await ctx.send(f"Error \n{e}")  
+    msg_lobbies = await ctx.send("")
 
+    while True:
+
+        # Stop monitoring
+        if stop_monitor:
+                await ctx.send("Monitoring Stopped!", view=None)
+                stop_monitor = False
+                return
+
+        # Update Messages
+        update_embed_role(msg_role, data_lobbies, role_ranked, guild_settings)
+        update_embed_lobbies(msg_lobbies)
+
+        sleep(5)
 
 
 @commands.has_permissions(administrator=True)

@@ -24,7 +24,7 @@ def role_report(setting):
     roles_dictionary = {}
     for i in range(len(setting["notifications"]["custom"])):
         roles_text += (f"\n{emoji_roles[i]}  {list(setting['notifications']['custom'].keys())[i]}")
-        roles_dictionary[str(emoji_roles[i])] = str(list(setting["notifications"]["custom"].keys()[i])[i])
+        roles_dictionary[str(emoji_roles[i])] = str(list(setting["notifications"]["custom"].keys())[i])
     
     role_embed = discord.Embed(
         title="Roles",
