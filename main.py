@@ -122,26 +122,23 @@ async def lobby(ctx):
 @bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
 async def lst(ctx):
     
-
-    # Purge the channel
-    try:
-        def check(msg):
-            return True
-        await ctx.channel.purge(limit=None, check=check, bulk=True)
-    except Exception as e:
-        await ctx.send(f"error: \n{e}")
-
-    # send messages
-
     with open('server_settings.json', 'r') as ss:
-        setting = json.load(ss)
-    msg_role = await ctx.send(msf.role_report(setting))
+        data_settings = json.load(ss)
 
     with open("data.json", 'r') as dataFile:
-        data = json.load(dataFile)
-        text, view = await msf.lobby_report(data["lobbies"],server_setting[str(ctx.guild.id)])
-        await ctx.send(text,view=view)
-    msg_lobbies = await ctx.send(text,view=view)
+        data_lobbies = json.load(dataFile)
+    
+    # Purge the channel
+    # try:
+    #     def check(msg):
+    #         return True
+    #     await ctx.channel.purge(limit=None, check=check, bulk=True)
+    # except Exception as e:
+    #     await ctx.send(f"error: \n{e}")
+
+    # messages
+    msg_role = await ctx.send(msf.role_report(data_settings))
+
 
 
 @commands.has_permissions(administrator=True)
