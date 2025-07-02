@@ -121,8 +121,7 @@ async def lobby(ctx):
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
 async def lst(ctx):
-
-
+    
 
     # Purge the channel
     try:
@@ -134,8 +133,15 @@ async def lst(ctx):
 
     # send messages
 
-    msg_role = await ctx.send(msf.role_report())
-    msg_lobbies = await ctx.send(msf.lobby_report())
+    with open('server_settings.json', 'r') as ss:
+        setting = json.load(ss)
+    msg_role = await ctx.send(msf.role_report(setting))
+
+    with open("data.json", 'r') as dataFile:
+        data = json.load(dataFile)
+        text, view = await msf.lobby_report(data["lobbies"],server_setting[str(ctx.guild.id)])
+        await ctx.send(text,view=view)
+    msg_lobbies = await ctx.send(text,view=view)
 
 
 @commands.has_permissions(administrator=True)
