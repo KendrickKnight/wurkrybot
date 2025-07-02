@@ -3,7 +3,7 @@ from discord.ext import commands
 import logging
 from dotenv import load_dotenv
 import os
-from time import sleep
+import asyncio
 import json
 import sys
 import subprocess
@@ -137,7 +137,7 @@ async def lst(ctx):
         embed_role, dict_roles = msf.role_report(guild_settings)
 
         # Update embed
-        msg_id.edit(embed = embed_role)
+        await msg_id.edit(embed = embed_role)
 
         # Add reactions
             #TODO: check if the bot already has added a certain reaction
@@ -176,12 +176,12 @@ async def lst(ctx):
 
         # Update Messages
         try:
-            update_embed_role(msg_role, data_lobbies, role_ranked, guild_settings)
-            update_embed_lobbies(msg_lobbies)
+            await update_embed_role(msg_role, guild_settings)
+            await update_embed_lobbies(msg_lobbies, data_lobbies, role_ranked, guild_settings)
         except Exception as e:
             await ctx.send(f"error: \n{e}")
 
-        sleep(5)
+        await asyncio.sleep(5)
 
 
 @commands.has_permissions(administrator=True)
@@ -193,7 +193,7 @@ async def lobby_start(ctx):
         return True  # All messages
     await ctx.channel.purge(limit=None, check=check, bulk=True)
     await ctx.send("Very well, i'l start in 5 seconds.")
-    sleep(5)
+    await asyncio.sleep(5)
 
     with open("server_settings.json", "r") as settingfile:
         setting = json.load(settingfile)
@@ -274,7 +274,7 @@ async def lobby_start(ctx):
             
 
 
-        sleep(2)
+        await asyncio.sleep(2)
     
 @commands.has_permissions(administrator=True)
 @bot.command(help="[Admin] () stops !lobby_start command")
