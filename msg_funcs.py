@@ -4,15 +4,29 @@ from discord.ext import commands
 lwg_link = "https://littlewargame.com/play/"
 emoji_running = ":man_running_facing_right:"
 emoji_lock = ":lock:"
+emoji_roles = [':one:',
+               ':two:',
+               ':three:',
+               ':four:',
+               ':five:',
+               ':six:',
+               ':seven:',
+               ':eight:',
+               ':nine:',]
 
-
-
-# Commoun Codes 
 def link_button_view():
     view = discord.ui.View()
     item = discord.ui.Button(style=discord.ButtonStyle.link, label='Join', url=lwg_link)
     view.add_item(item=item)
  
+def role_report(setting):
+    text = "Roles \n select the roles you wanna be notified for.\n"
+
+    text += ":zero: Ranked"
+    for i in len(setting["notifications"]["custom"]):
+        text += (emoji_roles[i] + " " + setting["notifications"]["custom"].keys()[i])
+    
+    return text
 
 async def lobby_report(data, setting):
         # Generating message text

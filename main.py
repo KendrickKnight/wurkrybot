@@ -118,6 +118,25 @@ async def lobby(ctx):
         text, view = await msf.lobby_report(data["lobbies"],server_setting[str(ctx.guild.id)])
         await ctx.send(text,view=view)
 
+@commands.has_permissions(administrator=True)
+@bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
+async def lst(ctx):
+
+
+
+    # Purge the channel
+    try:
+        def check(msg):
+            return True
+        await ctx.channel.purge(limit=None, check=check, bulk=True)
+    except Exception as e:
+        await ctx.send(f"error: \n{e}")
+
+    # send messages
+
+    msg_role = await ctx.send(msf.role_report)
+    msg_lobbies = await ctx.send(msf.lobby_report)
+
 
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
@@ -129,9 +148,6 @@ async def lobby_start(ctx):
     await ctx.channel.purge(limit=None, check=check, bulk=True)
     await ctx.send("Very well, i'l start in 5 seconds.")
     sleep(5)
-
-
-    role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
 
     with open("server_settings.json", "r") as settingfile:
         setting = json.load(settingfile)
@@ -357,7 +373,7 @@ async def filter_add(ctx, role, map_name):
         with open("server_settings.json","r") as ss:
             server_set = json.load(ss)
         setting_custom = server_set[str(ctx.guild.id)]["notifications"]["custom"]
-        setting_custom[role] = dict(map = map_name ,enabled=False)
+        setting_custom[role] = dict(map = map_name ,enabled=True)
         with open("server_settings.json","w") as ss2:
             json.dump(server_set, ss2, indent=4)
         guild = ctx.guild
@@ -366,19 +382,6 @@ async def filter_add(ctx, role, map_name):
         await filter_view(ctx)
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
-
-# @commands.has_permissions(administrator=True)
-# @bot.command(help = "[Admin] (old_role, new_role, new_map) edit a filters.")
-# async def filter_edit(ctx, old_role, new_role, new_map):
-#     with open("server_settings.json", "r") as ss:
-#         server_settings = json.load(ss)
-#         server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(old_role)
-#         setting_custom[new_role] = dict(map = new_map ,enabled=False)
-#     with open("server_settings.json","w") as ss2:
-#         json.dump(server_set, ss2, indent=4)
-#     await ctx.send(f"It is done")
-#     await filter_view(ctx)
-
 
 @commands.has_permissions(administrator=True)
 @bot.command(help = "[Admin] (role_name) removes a filter.")
@@ -397,7 +400,7 @@ async def filter_remove(ctx, role):
                 await ctx.send(f"Role `{role}` has been deleted.")
             else:
                 await ctx.send(f"Role `{role}` not found.")
-            await ctx.send(f"Role `{role.name}` has been deleted.")
+            await ctx.send(f"Role `{role}` has been deleted.")
         except discord.Forbidden:
             await ctx.send("I don't have permission to delete that role.")
         except discord.HTTPException as e:
