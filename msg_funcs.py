@@ -104,6 +104,6 @@ async def customs_notif(ctx, data):
         map_name = data[i]["map"]
 
         if enabled:
-            bot.ranked_notice_message = await ctx.send(f"{role.mention}")
-            await bot.ranked_notice_message.delete()
+            ranked_notice_message = await ctx.send(f"{role.mention}")
+            await ranked_notice_message.delete()
 

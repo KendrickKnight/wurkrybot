@@ -175,8 +175,11 @@ async def lst(ctx):
                 return
 
         # Update Messages
-        update_embed_role(msg_role, data_lobbies, role_ranked, guild_settings)
-        update_embed_lobbies(msg_lobbies)
+        try:
+            update_embed_role(msg_role, data_lobbies, role_ranked, guild_settings)
+            update_embed_lobbies(msg_lobbies)
+        except Exception as e:
+            await ctx.send(f"error: \n{e}")
 
         sleep(5)
 
