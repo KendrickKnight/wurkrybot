@@ -141,9 +141,12 @@ async def lst(ctx):
 
     # Initial messages
     try:
+        # Role message
         msg_role = await ctx.send(embed=role_embed)
         for i in roles_dictionary.keys():
             await msg_role.add_reaction(i)
+        
+        # Lobby Message
     except Exception as e:
         await ctx.send(f"Error \n{e}")  
 

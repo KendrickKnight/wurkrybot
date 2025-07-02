@@ -22,9 +22,9 @@ def link_button_view():
 def role_report(setting):
     roles_text = ":zero: Ranked"
     roles_dictionary = {}
-    for i in len(setting["notifications"]["custom"]):
-        text += (f"\n{emoji_roles[i]}  {setting["notifications"]["custom"].keys()[i]}")
-        roles_dictionary[str(emoji_roles[i])] = str(setting["notifications"]["custom"].keys()[i])
+    for i in range(len(setting["notifications"]["custom"])):
+        roles_text += (f"\n{emoji_roles[i]}  {list(setting['notifications']['custom'].keys())[i]}")
+        roles_dictionary[str(emoji_roles[i])] = str(list(setting["notifications"]["custom"].keys()[i])[i])
     
     role_embed = discord.Embed(
         title="Roles",
