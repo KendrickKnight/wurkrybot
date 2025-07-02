@@ -141,7 +141,7 @@ async def lst(ctx):
         msg_role = await ctx.send(msf.role_report(data_settings))
     except Exception as e:
         await ctx.send(f"Error \n{e}")
-
+    
 
 
 @commands.has_permissions(administrator=True)
