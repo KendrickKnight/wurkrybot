@@ -171,9 +171,10 @@ async def lst(ctx):
 
     # Initial messages
         # Role message
-    global msg_role = await ctx.send("0")
+    global msg_role, msg_lobbies
+    msg_role = await ctx.send("0")
         # Lobby Message
-    global msg_lobbies = await ctx.send("0")
+    msg_lobbies = await ctx.send("0")
 
     while True:
 
@@ -192,16 +193,22 @@ async def lst(ctx):
 
         await asyncio.sleep(5)
 
+# Global variables for message tracking
+msg_role = None
+msg_lobbies = None
+
 @bot.event
 async def on_raw_reaction_add(payload):
-    if payload.message_id == msg_role.id:
+    # Only process reactions on the role message
+    if msg_role is None or payload.message_id != msg_role.id:
         return
 
     guild = bot.get_guild(payload.guild_id)
     if guild is None:
         return
+    
     emoji = str(payload.emoji)
-    role_name = dict_role.get(emoji)
+    role_name = dict_roles.get(emoji)
     if role_name is None:
         return
 
@@ -214,14 +221,11 @@ async def on_raw_reaction_add(payload):
         return
 
     await member.add_roles(role)
-    
-        
-
-
 
 @bot.event
 async def on_raw_reaction_remove(payload):
-    if payload.message_id != msg_role.id:
+    # Only process reactions on the role message
+    if msg_role is None or payload.message_id != msg_role.id:
         return
 
     guild = bot.get_guild(payload.guild_id)
@@ -229,7 +233,7 @@ async def on_raw_reaction_remove(payload):
         return
 
     emoji = str(payload.emoji)
-    role_name = dict_role.get(emoji)
+    role_name = dict_roles.get(emoji)
     if role_name is None:
         return
 
