@@ -135,27 +135,30 @@ async def gen_ranked(ctx):
         else:
             data["searching"] = True
 
-    with open("data.json", 'w'):
+    with open("data.json", 'w') as dataFile:
         json.dump(data, dataFile, indent=4)
 
 @bot.command(help="[Member] () add a lobby with a map name")
 async def gen_lobby(ctx, map):
     with open("data.json", 'r') as dataFile:
         data = json.load(dataFile)
-        random_lobby = {
-            "name": str(map),
-            "host": "guest_Randy",
-            "map": str(map),
-            "player_count": "[1/2]",
-            "running": bool(random.getrandbits(1)),
-            "locked": bool(random.getrandbits(1)),
-            }
-        data["lobbies"].append(random_lobby)
-        with open("data.json", 'w'):
-            json.dump(data, dataFile, indent=4)
-            await ctx.send("lobby generated")
-            await asyncio.sleep(5)
-            await ctx.message.delete()
+    
+    random_lobby = {
+        "name": str(map),
+        "host": "guest_Randy",
+        "map": str(map),
+        "player_count": "[1/2]",
+        "running": bool(random.getrandbits(1)),
+        "locked": bool(random.getrandbits(1)),
+    }
+    data["lobbies"].append(random_lobby)
+    
+    with open("data.json", 'w') as dataFile:
+        json.dump(data, dataFile, indent=4)
+    
+    await ctx.send("lobby generated")
+    await asyncio.sleep(5)
+    await ctx.message.delete()
 
 @commands.has_permissions(administrator=True)
 @bot.command(
