@@ -1,0 +1,22 @@
+{
+    "searching": true,
+    "lobbies": [
+        {
+            "name": "Raid Wars Classic ",
+            "host": "guest_658335",
+            "map": "Raid Wars Classic",
+            "player_count": "[1/2]",
+            "running": false,
+            "locked": true
+        },
+        {
+            "name": "ora",
+            "host": "guest_Randy",
+            "map": "ora",
+            "player_count": "[1/2]",
+            "running": true,
+            "locked": true
+        }
+    ],
+    "connection": true
+}

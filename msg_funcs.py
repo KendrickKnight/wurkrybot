@@ -26,7 +26,7 @@ def role_report(ctx):
         data_settings = json.load(ss)
         setting = data_settings[str(ctx.guild.id)]
     
-    roles_text = "0️⃣ Ranked"
+    roles_text = "0️⃣ ranked"
     roles_dictionary = {"0️⃣" : "ranked"}
 
     count_role = 0
