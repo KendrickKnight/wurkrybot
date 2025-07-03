@@ -1,30 +1,39 @@
-import discord 
+import discord
+import json
 from discord.ext import commands
 
 lwg_link = "https://littlewargame.com/play/"
 emoji_running = ":man_running_facing_right:"
 emoji_lock = ":lock:"
-emoji_roles = [':one:',
-               ':two:',
-               ':three:',
-               ':four:',
-               ':five:',
-               ':six:',
-               ':seven:',
-               ':eight:',
-               ':nine:',]
+emoji_roles = ['0️⃣',
+               '1️⃣',
+               '2️⃣',
+               '3️⃣',
+               '4️⃣',
+               '5️⃣:',
+               '6️⃣:',
+               '7️⃣',
+               '8️⃣',
+              '9️⃣']
 
 def link_button_view():
     view = discord.ui.View()
     item = discord.ui.Button(style=discord.ButtonStyle.link, label='Join', url=lwg_link)
     view.add_item(item=item)
  
-def role_report(setting):
-    roles_text = ":zero: Ranked"
-    roles_dictionary = {}
-    for i in range(len(setting["notifications"]["custom"])):
-        roles_text += (f"\n{emoji_roles[i]}  {list(setting['notifications']['custom'].keys())[i]}")
-        roles_dictionary[str(emoji_roles[i])] = str(list(setting["notifications"]["custom"].keys())[i])
+def role_report(ctx):
+    with open('server_settings.json', 'r') as ss:
+        data_settings = json.load(ss)
+        setting = data_settings[str(ctx.guild.id)]
+    
+    roles_text = "0️⃣ Ranked"
+    roles_dictionary = {"0️⃣" : "ranked"}
+
+    count_role = 0
+    for i in setting["notifications"]["custom"].keys():
+        count_role += 1
+        roles_text += (f"\n{emoji_roles[count_role]}  {i}")
+        roles_dictionary[str(emoji_roles[count_role])] = str(i)
     
     role_embed = discord.Embed(
         title="Roles",

@@ -10,13 +10,13 @@ import subprocess
 
 import msg_funcs as msf
 
-from keep_alive import keep_alive
+# from keep_alive import keep_alive
 
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
-keep_alive()
+# keep_alive()
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
 intents = discord.Intents.default()
@@ -24,6 +24,8 @@ intents.message_content = True
 
 stop_monitor = False
 rank_notice = True
+
+dict_roles = {}
 
 # ---- use only ONE bot instance ----
 # class MyBot(commands.Bot):
@@ -130,41 +132,48 @@ async def lst(ctx):
         data_lobbies = json.load(dataFile)
     
     role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
+    global stop_monitor
 
+    async def update_embed_role(ctx, msg_id, guild_settings):
 
-    async def update_embed_role(msg_id, guild_settings):
-
-        embed_role, dict_roles = msf.role_report(guild_settings)
-
-        # Update embed
-        await msg_id.edit(embed = embed_role)
+        embed_role, dict_roles = msf.role_report(ctx)
 
         # Add reactions
-            #TODO: check if the bot already has added a certain reaction
         for i in dict_roles.keys():
             await msg_id.add_reaction(i)
+
+        # Remove extra reactions
+        message = await ctx.channel.fetch_message(msg_id.id)
+        for reaction in message.reactions:
+            if str(reaction.emoji) not in dict_roles.keys():
+                await msg_id.clear_reaction(reaction.emoji)
+
+        
+        # Update embed
+        await msg_id.edit(content = "", embed = embed_role)
+
 
     async def update_embed_lobbies(msg_id, data, role_ranked, guild_settings):
         text, view = await msf.monitor_report(data, role_ranked, guild_settings)
         await msg_id.edit(content=text ,view=view)
-    
+
     async def update_notif():
         pass
 
 
     # Purge the channel
-    # try:
-    #     def check(msg):
-    #         return True
-    #     await ctx.channel.purge(limit=None, check=check, bulk=True)
-    # except Exception as e:
-    #     await ctx.send(f"error: \n{e}")
+    try:
+        def check(msg):
+            return True
+        await ctx.channel.purge(limit=None, check=check, bulk=True)
+    except Exception as e:
+        await ctx.send(f"error: \n{e}")
 
     # Initial messages
         # Role message
-    msg_role = await ctx.send("")
+    global msg_role = await ctx.send("0")
         # Lobby Message
-    msg_lobbies = await ctx.send("")
+    global msg_lobbies = await ctx.send("0")
 
     while True:
 
@@ -176,12 +185,69 @@ async def lst(ctx):
 
         # Update Messages
         try:
-            await update_embed_role(msg_role, guild_settings)
+            await update_embed_role(ctx, msg_role, guild_settings)
             await update_embed_lobbies(msg_lobbies, data_lobbies, role_ranked, guild_settings)
         except Exception as e:
             await ctx.send(f"error: \n{e}")
 
         await asyncio.sleep(5)
+
+@bot.event
+async def on_raw_reaction_add(payload):
+    if payload.message_id == msg_role.id:
+        return
+
+    guild = bot.get_guild(payload.guild_id)
+    if guild is None:
+        return
+    emoji = str(payload.emoji)
+    role_name = dict_role.get(emoji)
+    if role_name is None:
+        return
+
+    role = discord.utils.get(guild.roles, name=role_name)
+    if role is None:
+        return
+
+    member = guild.get_member(payload.user_id)
+    if member is None or member.bot:
+        return
+
+    await member.add_roles(role)
+    
+        
+
+
+
+@bot.event
+async def on_raw_reaction_remove(payload):
+    if payload.message_id != msg_role.id:
+        return
+
+    guild = bot.get_guild(payload.guild_id)
+    if guild is None:
+        return
+
+    emoji = str(payload.emoji)
+    role_name = dict_role.get(emoji)
+    if role_name is None:
+        return
+
+    role = discord.utils.get(guild.roles, name=role_name)
+    if role is None:
+        return
+
+    member = guild.get_member(payload.user_id)
+    if member is None:
+        # Not cached, need to fetch
+        member = await guild.fetch_member(payload.user_id)
+
+    if member.bot:
+        return
+
+    await member.remove_roles(role)
+
+
 
 
 @commands.has_permissions(administrator=True)
@@ -424,8 +490,6 @@ async def filter_add(ctx, role, map_name):
             json.dump(server_set, ss2, indent=4)
         guild = ctx.guild
         await guild.create_role(name=role)
-        await ctx.send(f"{role} filter is added. \n Current filters:")
-        await filter_view(ctx)
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
 
@@ -451,9 +515,6 @@ async def filter_remove(ctx, role):
             await ctx.send("I don't have permission to delete that role.")
         except discord.HTTPException as e:
             await ctx.send(f"Failed to delete role: {e}")
-
-        await ctx.send(f"{role} filter is removed. \n Current filters:")
-        await filter_view(ctx)
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
     
