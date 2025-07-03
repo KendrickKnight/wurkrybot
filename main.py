@@ -7,18 +7,20 @@ import asyncio
 import json
 import sys
 import subprocess
+import random
 
 import msg_funcs as msf
 
 # from keep_alive import keep_alive
-
 
 load_dotenv()
 token = os.getenv('DISCORD_TOKEN')
 
 # keep_alive()
 
-handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
+handler = logging.FileHandler(filename='discord.log',
+                              encoding='utf8',
+                              mode='w')
 intents = discord.Intents.default()
 intents.message_content = True
 
@@ -38,43 +40,45 @@ dict_roles = {}
 
 bot = commands.Bot(command_prefix='!', intents=intents)
 
+
 @bot.event
 async def on_ready():
     print(f'{bot.user.name} is ready to rumble!')
+
 
 @bot.event
 async def on_guild_join(ctx, guild):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
-    
-    if guild.id not in server_settings: 
-        server_settings[ctx.guild.id]  = {
-            "notifications":{
-                    "ranked" : False,
-                    "custom" : {}
-                }
+
+    if guild.id not in server_settings:
+        server_settings[ctx.guild.id] = {
+            "notifications": {
+                "ranked": False,
+                "custom": {}
             }
+        }
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings, ss, indent=4)
-
-
 
 
 @commands.has_permissions(administrator=True)
-@bot.command(help="[Admin] () if server has no settings file, adds it for that server")
+@bot.command(
+    help="[Admin] () if server has no settings file, adds it for that server")
 async def add_server_setting(ctx):
     with open("server_settings.json", "r") as ss:
         server_settings = json.load(ss)
-    
-    if ctx.guild.id not in server_settings: 
-        server_settings[ctx.guild.id]  = {
-            "notifications":{
-                    "ranked" : False,
-                    "custom" : {}
-                }
+
+    if ctx.guild.id not in server_settings:
+        server_settings[ctx.guild.id] = {
+            "notifications": {
+                "ranked": False,
+                "custom": {}
             }
+        }
         with open("server_settings.json", "w") as ss:
             json.dump(server_settings, ss, indent=4)
+
 
 # ---------------------------------------------------------------------------- #
 #                             Scraper Bot Handling                             #
@@ -82,8 +86,9 @@ async def add_server_setting(ctx):
 
 reporter_process = None
 
+
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () Start the scraper")
+@bot.command(help="[Admin] () Start the scraper")
 async def reporter_start(ctx):
     global reporter_process
     if reporter_process is None:
@@ -94,7 +99,7 @@ async def reporter_start(ctx):
 
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () Stop the scraper")
+@bot.command(help="[Admin] () Stop the scraper")
 async def reporter_stop(ctx):
     global reporter_process
     if reporter_process:
@@ -105,23 +110,56 @@ async def reporter_stop(ctx):
         await ctx.send("Reporter is already offduty.")
 
 
-
-
 # ---------------------------------------------------------------------------- #
 #                         Lobby and Monitoring Cmmands                         #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "[Member] () Shows all lobbies at this singular moment")
+
+@bot.command(help="[Member] () Shows all lobbies at this singular moment")
 async def lobby(ctx):
     with open("server_settings.json", "r") as ss:
         server_setting = json.load(ss)
     with open("data.json", 'r') as dataFile:
         data = json.load(dataFile)
-        text, view = await msf.lobby_report(data["lobbies"],server_setting[str(ctx.guild.id)])
-        await ctx.send(text,view=view)
+        text, view = await msf.lobby_report(data["lobbies"],
+                                            server_setting[str(ctx.guild.id)])
+        await ctx.send(text, view=view)
+
+
+@bot.command(help="[Member] () toggle ranked searching")
+async def gen_ranked(ctx):
+    with open("data.json", 'r') as dataFile:
+        data = json.load(dataFile)
+        if data["searching"]:
+            data["searching"] = False
+        else:
+            data["searching"] = True
+
+    with open("data.json", 'w'):
+        json.dump(data, dataFile, indent=4)
+
+@bot.command(help="[Member] () add a lobby with a map name")
+async def gen_lobby(ctx, map):
+    with open("data.json", 'r') as dataFile:
+        data = json.load(dataFile)
+        random_lobby = {
+            "name": str(map),
+            "host": "guest_Randy",
+            "map": str(map),
+            "player_count": "[1/2]",
+            "running": bool(random.getrandbits(1)),
+            "locked": bool(random.getrandbits(1)),
+            }
+        data["lobbies"].append(random_lobby)
+        with open("data.json", 'w'):
+            json.dump(data, dataFile, indent=4)
+            await ctx.send("lobby generated")
+            await asyncio.sleep(5)
+            await ctx.message.delete()
 
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
+@bot.command(
+    help="[Admin] () purge a channel's messages, start monitoring LWG lobbies")
 async def lst(ctx):
     
     with open('server_settings.json', 'r') as ss:
@@ -130,12 +168,14 @@ async def lst(ctx):
 
     with open("data.json", 'r') as dataFile:
         data_lobbies = json.load(dataFile)
-    
+
     role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
+    role_notif_status = {}
+    
     global stop_monitor
 
     async def update_embed_role(ctx, msg_id, guild_settings):
-
+        global dict_roles
         embed_role, dict_roles = msf.role_report(ctx)
 
         # Add reactions
@@ -148,83 +188,132 @@ async def lst(ctx):
             if str(reaction.emoji) not in dict_roles.keys():
                 await msg_id.clear_reaction(reaction.emoji)
 
-        
         # Update embed
-        await msg_id.edit(content = "", embed = embed_role)
+        await msg_id.edit(content="", embed=embed_role)
 
+
+    async def update_server_roles(ctx, guild_settings):
+
+        if not role_ranked:
+            guild = ctx.guild
+            await guild.create_role(name="ranked")
+
+        for i in guild_settings["notifications"]["custom"].keys():
+            guild = ctx.guild
+            if i not in [role.name for role in guild.roles]:
+                guild = ctx.guild
+                await guild.create_role(name=i)
 
     async def update_embed_lobbies(msg_id, data, role_ranked, guild_settings):
-        text, view = await msf.monitor_report(data, role_ranked, guild_settings)
-        await msg_id.edit(content=text ,view=view)
+        text, view = await msf.monitor_report(data, role_ranked,
+                                              guild_settings)
+        await msg_id.edit(content=text, view=view)
 
-    async def update_notif():
+    async def update_role_notif_status():
+
+        for i in dict_roles.keys():
+            if dict_roles[i] not in role_notif_status.keys():
+                role_notif_status[i] = False
+
+    async def role_notification(ctx, data):
+
+        # Ranked Notification
+        if not role_notif_status["ranked"] and data["searching"]:
+            role_notif_status["ranked"] = True
+            ranked_notif = await ctx.send(f"{role_ranked.mention}")
+            await asyncio.sleep(0.5)
+            await ranked_notif.delete()
+
+        # Custom Notification
+        for role in role_notif_status.keys():
+            if role != "ranked" and not role_notif_status[role] and any(
+                    role.lower() in lobby["map"].lower()
+                    for lobby in data["lobbies"]):
+                role_notif_status[role] = True
+                custom_notif = await ctx.send(
+                    f"{discord.utils.get(ctx.guild.roles, name=role).mention}")
+                await asyncio.sleep(0.5)
+                await custom_notif.delete()
+        
         pass
-
-
     # Purge the channel
     try:
+
         def check(msg):
             return True
+
         await ctx.channel.purge(limit=None, check=check, bulk=True)
     except Exception as e:
         await ctx.send(f"error: \n{e}")
 
     # Initial messages
-        # Role message
+    # Role message
     global msg_role, msg_lobbies
     msg_role = await ctx.send("0")
-        # Lobby Message
+    # Lobby Message
     msg_lobbies = await ctx.send("0")
+
+    # adds missing roles to the server
+    await update_server_roles(ctx, guild_settings)
 
     while True:
 
         # Stop monitoring
         if stop_monitor:
-                await ctx.send("Monitoring Stopped!", view=None)
-                stop_monitor = False
-                return
+            await ctx.send("Monitoring Stopped!", view=None)
+            stop_monitor = False
+            return
 
         # Update Messages
         try:
             await update_embed_role(ctx, msg_role, guild_settings)
-            await update_embed_lobbies(msg_lobbies, data_lobbies, role_ranked, guild_settings)
+            await update_embed_lobbies(msg_lobbies, data_lobbies, role_ranked,
+                                       guild_settings)
+            await update_role_notif_status()
         except Exception as e:
             await ctx.send(f"error: \n{e}")
 
         await asyncio.sleep(5)
 
-# Global variables for message tracking
-msg_role = None
-msg_lobbies = None
+
+# TODO:
+# add the notification system
+
 
 @bot.event
 async def on_raw_reaction_add(payload):
-    # Only process reactions on the role message
+    if payload.user_id == bot.user.id:
+        return
+
     if msg_role is None or payload.message_id != msg_role.id:
         return
 
     guild = bot.get_guild(payload.guild_id)
     if guild is None:
         return
-    
+
     emoji = str(payload.emoji)
-    role_name = dict_roles.get(emoji)
+    role_name = dict_roles[emoji]
     if role_name is None:
+        await msg_role.clear_reaction(payload.emoji)
         return
 
     role = discord.utils.get(guild.roles, name=role_name)
     if role is None:
         return
 
-    member = guild.get_member(payload.user_id)
+    member = await guild.fetch_member(payload.user_id)
     if member is None or member.bot:
         return
 
     await member.add_roles(role)
 
+
 @bot.event
 async def on_raw_reaction_remove(payload):
-    # Only process reactions on the role message
+    if payload.user_id == bot.user.id:
+        return
+
     if msg_role is None or payload.message_id != msg_role.id:
         return
 
@@ -233,7 +322,7 @@ async def on_raw_reaction_remove(payload):
         return
 
     emoji = str(payload.emoji)
-    role_name = dict_roles.get(emoji)
+    role_name = dict_roles[emoji]
     if role_name is None:
         return
 
@@ -241,26 +330,22 @@ async def on_raw_reaction_remove(payload):
     if role is None:
         return
 
-    member = guild.get_member(payload.user_id)
-    if member is None:
-        # Not cached, need to fetch
-        member = await guild.fetch_member(payload.user_id)
-
-    if member.bot:
+    member = await guild.fetch_member(payload.user_id)
+    if member is None or member.bot:
         return
 
     await member.remove_roles(role)
 
 
-
-
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () purge a channel's messages, start monitoring LWG lobbies")
+@bot.command(
+    help="[Admin] () purge a channel's messages, start monitoring LWG lobbies")
 async def lobby_start(ctx):
- 
+
     #Initial channel clear and message
     def check(msg):
         return True  # All messages
+
     await ctx.channel.purge(limit=None, check=check, bulk=True)
     await ctx.send("Very well, i'l start in 5 seconds.")
     await asyncio.sleep(5)
@@ -272,20 +357,18 @@ async def lobby_start(ctx):
     global stop_monitor
     role_ranked = discord.utils.get(ctx.guild.roles, name="ranked")
     last_ranked_search_status = False
-    
+
     notif_list_setting = []
     notif_list = []
     for i in guild_setting["notifications"]["custom"]:
         notif_list.append(False)
         notif_list_setting.append(False)
 
-    
     while True:
         with open('data.json', 'r') as dataFile:
             data = json.load(dataFile)
             messages = [msg async for msg in ctx.channel.history(limit=50)]
-            
-            
+
             if stop_monitor:
                 await ctx.send("Monitoring Stopped!", view=None)
                 stop_monitor = False
@@ -297,233 +380,271 @@ async def lobby_start(ctx):
                     await messages[i].delete()
                 elif messages[i].author == bot.user and i != 0:
                     await messages[i].delete()
-                    
+
             if messages[-1].author != bot.user:
                 await messages[-1].delete()
             else:
-                text, view = await msf.monitor_report(data, role_ranked, guild_setting)
-                await messages[-1].edit(content=text ,view=view)
-            
-            
+                text, view = await msf.monitor_report(data, role_ranked,
+                                                      guild_setting)
+                await messages[-1].edit(content=text, view=view)
+
         #Notifications
-            #Ranked Notification
+        #Ranked Notification
             if guild_setting["notifications"]["ranked"] == True:
                 if data["searching"] == True and last_ranked_search_status == False:
                     last_ranked_search_status = True
-                    bot.ranked_notice_message = await ctx.send(f"{role_ranked.mention}")
+                    bot.ranked_notice_message = await ctx.send(
+                        f"{role_ranked.mention}")
                     await bot.ranked_notice_message.delete()
                 elif data["searching"] == False:
                     last_ranked_search_status = False
-                    
+
             #Custom_role Notifications
             count = 0
             for i in guild_setting["notifications"]["custom"]:
                 gs = guild_setting["notifications"]["custom"]
                 map_exist = False
                 for k in data["lobbies"]:
-                    if gs[i]["enabled"] == True and i.lower() in k["map"].lower():
+                    if gs[i]["enabled"] == True and i.lower(
+                    ) in k["map"].lower():
                         map_exist = True
-                
+
                 if map_exist:
                     notif_list[count] = True
                 else:
                     notif_list[count] = False
                 count += 1
-            
 
             notif_list_count = 0
             for i in guild_setting["notifications"]["custom"]:
-                if notif_list[notif_list_count] == True and notif_list_setting[notif_list_count] == False:
+                if notif_list[notif_list_count] == True and notif_list_setting[
+                        notif_list_count] == False:
                     notif_list_setting[notif_list_count] = True
-                    bot.ranked_notice_message = await ctx.send(f"{discord.utils.get(ctx.guild.roles, name = i).mention}")
+                    bot.ranked_notice_message = await ctx.send(
+                        f"{discord.utils.get(ctx.guild.roles, name = i).mention}"
+                    )
                     await bot.ranked_notice_message.delete()
                 elif notif_list[notif_list_count] == False:
                     notif_list_setting[notif_list_count] = False
                 notif_list_count += 1
             notif_list_count = 0
-            
-
 
         await asyncio.sleep(2)
-    
+
+
 @commands.has_permissions(administrator=True)
 @bot.command(help="[Admin] () stops !lobby_start command")
 async def lobby_stop(ctx):
     global stop_monitor
-    stop_monitor =  True
+    stop_monitor = True
+
 
 # ---------------------------------------------------------------------------- #
 #                                 Bot Commands                                 #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "[Member] () Says hi :D")
+
+@bot.command(help="[Member] () Says hi :D")
 async def hi(ctx):
     await ctx.send(f"Hello {ctx.author.mention}!")
 
+
 @commands.has_permissions(manage_messages=True)
-@bot.command(help = "[Admin] () clears all messages sent in the past 14 days")
+@bot.command(help="[Admin] () clears all messages sent in the past 14 days")
 async def bot_clear_all(ctx):
+
     def check(msg):
         return True  # All messages
+
     await ctx.channel.purge(limit=None, check=check, bulk=True)
 
+
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () shuts the bot down")
+@bot.command(help="[Admin] () shuts the bot down")
 async def bot_shutdown(ctx):
     global reporter_process
-    lobby_stop(ctx)
+    await lobby_stop(ctx)
     if reporter_process:
         reporter_process.terminate()
         reporter_process = None
     await ctx.send("Shutting down...")
     await bot.close()
     sys.exit()  # Optional: exits Python process
-    
+
+
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () Restarts the bot")
+@bot.command(help="[Admin] () Restarts the bot")
 async def bot_restart(ctx):
     lobby_stop(ctx)
     await ctx.send("Restarting...")
     await bot.close()
     os.execv(sys.executable, ['python'] + sys.argv)
 
+
 # ---------------------------------------------------------------------------- #
 #                                 Role Commands                                #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "[Member] (role_name) Give yourself a map role if it exist")
-async def role_get(ctx, role_name):
-    with open("server_settings.json", "r") as ss:
-        ss = json.load(ss)
-        server_settings = ss[str(ctx.guild.id)]["notifications"]["custom"]
 
-        role = discord.utils.get(ctx.guild.roles, name = role_name)
+# @bot.command(help="[Member] (role_name) Give yourself a map role if it exist")
+# async def role_get(ctx, role_name):
+#     with open("server_settings.json", "r") as ss:
+#         ss = json.load(ss)
+#         server_settings = ss[str(ctx.guild.id)]["notifications"]["custom"]
 
-        if role_name.lower() != "ranked" and role_name.lower() not in server_settings.keys():
-            await ctx.send("i cant find this role. CHECK YOUR SPELLING SWINE!")
-        elif role in ctx.author.roles:
-            await ctx.send(f"{ctx.author.mention}, you already have this role!")
-        else:
-            await ctx.author.add_roles(role)
-            await ctx.send(f"Congrats {ctx.author.mention}! you now have {role} role!")
+#         role = discord.utils.get(ctx.guild.roles, name=role_name)
 
-
-
-@bot.command(help = "[Member] (role_name) remove a role you have")
-async def role_remove(ctx, role_name):
-    with open("server_settings.json", "r") as ss:
-        ss = json.load(ss)
-        server_settings = ss[str(ctx.guild.id)]["notifications"]["custom"]
-
-        role = discord.utils.get(ctx.guild.roles, name = role_name)
-
-        if role_name.lower() != "ranked" and role_name.lower() not in server_settings.keys():
-            await ctx.send("i cant find this role. CHECK YOUR SPELLING SWINE!")
-        elif role in ctx.author.roles:
-            await ctx.author.remove_roles(role)
-            await ctx.send(f"Very well {ctx.author.mention}! your {role} role has been removed!")
-        else:
-            await ctx.send(f"Sry {ctx.author.mention}, You dont have this role :(")
+#         if role_name.lower() != "ranked" and role_name.lower(
+#         ) not in server_settings.keys():
+#             await ctx.send("i cant find this role. CHECK YOUR SPELLING SWINE!")
+#         elif role in ctx.author.roles:
+#             await ctx.send(f"{ctx.author.mention}, you already have this role!"
+#                            )
+#         else:
+#             await ctx.author.add_roles(role)
+#             await ctx.send(
+#                 f"Congrats {ctx.author.mention}! you now have {role} role!")
 
 
+# @bot.command(help="[Member] (role_name) remove a role you have")
+# async def role_remove(ctx, role_name):
+#     with open("server_settings.json", "r") as ss:
+#         ss = json.load(ss)
+#         server_settings = ss[str(ctx.guild.id)]["notifications"]["custom"]
 
-# ---------------------------------------------------------------------------- #
-#                         Notification Toggle Commands                         #
-# ---------------------------------------------------------------------------- #
+#         role = discord.utils.get(ctx.guild.roles, name=role_name)
 
-@commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] () Enable/Disable rank notification")
-async def notif_ranked(ctx):
-    with open("server_settings.json","r") as ss:
-        server_setting = json.load(ss)
-        rank_notice = server_setting[str(ctx.guild.id)]["notifications"]
+#         if role_name.lower() != "ranked" and role_name.lower(
+#         ) not in server_settings.keys():
+#             await ctx.send("i cant find this role. CHECK YOUR SPELLING SWINE!")
+#         elif role in ctx.author.roles:
+#             await ctx.author.remove_roles(role)
+#             await ctx.send(
+#                 f"Very well {ctx.author.mention}! your {role} role has been removed!"
+#             )
+#         else:
+#             await ctx.send(
+#                 f"Sry {ctx.author.mention}, You dont have this role :(")
 
-    if rank_notice == True:
-        rank_notice["ranked"] = False
-        await ctx.send("Ranked notification: Disabled")
-    else:
-        rank_notice["ranked"] = True
-        await ctx.send("Ranked notification: Enabled")
 
-    with open("server_settings.json","w") as ss:
-        json.dump(server_setting, ss, indent=4)
+# # ---------------------------------------------------------------------------- #
+# #                         Notification Toggle Commands                         #
+# # ---------------------------------------------------------------------------- #
 
-@commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] (role_name) Enable/Disable rank notification")
-async def notif_custom(ctx, role):
-    with open("server_settings.json","r") as ss:
-        server_setting = json.load(ss)
-    role_notif = server_setting[str(ctx.guild.id)]["notifications"]["custom"][role]["enabled"]
 
-    if role not in server_setting[str(ctx.guild.id)]["notifications"]["custom"]:
-        await ctx.send("This role doesnt exist in filter list")
-        return
-    
-    if role_notif == True:
-        server_setting[str(ctx.guild.id)]["notifications"]["custom"][role]["enabled"] = False
-        await ctx.send(f"{role}'s notification is now disabled")
-    else:
-        server_setting[str(ctx.guild.id)]["notifications"]["custom"][role]["enabled"] = True
-        await ctx.send(f"{role}'s notification is now enabled")
+# @commands.has_permissions(administrator=True)
+# @bot.command(help="[Admin] () Enable/Disable rank notification")
+# async def notif_ranked(ctx):
+#     with open("server_settings.json", "r") as ss:
+#         server_setting = json.load(ss)
+#         rank_notice = server_setting[str(ctx.guild.id)]["notifications"]
 
-    with open("server_settings.json","w") as ss:
-        json.dump(server_setting, ss, indent=4)
+#     if rank_notice == True:
+#         rank_notice["ranked"] = False
+#         await ctx.send("Ranked notification: Disabled")
+#     else:
+#         rank_notice["ranked"] = True
+#         await ctx.send("Ranked notification: Enabled")
+
+#     with open("server_settings.json", "w") as ss:
+#         json.dump(server_setting, ss, indent=4)
+
+
+# @commands.has_permissions(administrator=True)
+# @bot.command(help="[Admin] (role_name) Enable/Disable rank notification")
+# async def notif_custom(ctx, role):
+#     with open("server_settings.json", "r") as ss:
+#         server_setting = json.load(ss)
+#     role_notif = server_setting[str(
+#         ctx.guild.id)]["notifications"]["custom"][role]["enabled"]
+
+#     if role not in server_setting[str(
+#             ctx.guild.id)]["notifications"]["custom"]:
+#         await ctx.send("This role doesnt exist in filter list")
+#         return
+
+#     if role_notif == True:
+#         server_setting[str(
+#             ctx.guild.id)]["notifications"]["custom"][role]["enabled"] = False
+#         await ctx.send(f"{role}'s notification is now disabled")
+#     else:
+#         server_setting[str(
+#             ctx.guild.id)]["notifications"]["custom"][role]["enabled"] = True
+#         await ctx.send(f"{role}'s notification is now enabled")
+
+#     with open("server_settings.json", "w") as ss:
+#         json.dump(server_setting, ss, indent=4)
+
+
 # ---------------------------------------------------------------------------- #
 #                                Filter Commands                               #
 # ---------------------------------------------------------------------------- #
 
-@bot.command(help = "[Member] () displays a list of filters.")
+
+@bot.command(help="[Member] () displays a list of filters.")
 async def filter_view(ctx):
     try:
         with open("server_settings.json", "r") as ss:
             server_settings = json.load(ss)
-            server_roles = server_settings[str(ctx.guild.id)]["notifications"]["custom"]
-            await ctx.send("".join(list(f"> {i}: {server_roles[i]} \n" for i in server_roles)))
+            server_roles = server_settings[str(
+                ctx.guild.id)]["notifications"]["custom"]
+            await ctx.send("".join(
+                list(f"> {i}: {server_roles[i]} \n" for i in server_roles)))
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
 
+
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] (role_name, map_name) add a new filter.")
+@bot.command(help="[Admin] (role_name, map_name) add a new filter.")
 async def filter_add(ctx, role, map_name):
     try:
-        with open("server_settings.json","r") as ss:
+        with open("server_settings.json", "r") as ss:
             server_set = json.load(ss)
-        setting_custom = server_set[str(ctx.guild.id)]["notifications"]["custom"]
-        setting_custom[role] = dict(map = map_name ,enabled=True)
-        with open("server_settings.json","w") as ss2:
+        setting_custom = server_set[str(
+            ctx.guild.id)]["notifications"]["custom"]
+        setting_custom[role] = dict(map=map_name, enabled=True)
+        with open("server_settings.json", "w") as ss2:
             json.dump(server_set, ss2, indent=4)
         guild = ctx.guild
         await guild.create_role(name=role)
+        msg_filter_add = await ctx.send(f"new role `{role}` has been added.")
+        await asyncio.sleep(5)
+        await msg_filter_add.delete()
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
 
+
 @commands.has_permissions(administrator=True)
-@bot.command(help = "[Admin] (role_name) removes a filter.")
+@bot.command(help="[Admin] (role_name) removes a filter.")
 async def filter_remove(ctx, role):
     try:
         with open("server_settings.json", "r") as ss:
             server_settings = json.load(ss)
-            server_settings[str(ctx.guild.id)]["notifications"]["custom"].pop(role)
-        
+            server_settings[str(
+                ctx.guild.id)]["notifications"]["custom"].pop(role)
+
         with open("server_settings.json", "w") as ss:
-            json.dump(server_settings,ss, indent=4)
+            json.dump(server_settings, ss, indent=4)
         try:
             role_obj = discord.utils.get(ctx.guild.roles, name=role)
             if role_obj is not None:
                 await role_obj.delete()
-                await ctx.send(f"Role `{role}` has been deleted.")
+                msg_filter_remove = await ctx.send(
+                    f"Role `{role}` has been deleted.")
+                await asyncio.sleep(5)
+                await msg_filter_remove.delete()
             else:
                 await ctx.send(f"Role `{role}` not found.")
-            await ctx.send(f"Role `{role}` has been deleted.")
         except discord.Forbidden:
             await ctx.send("I don't have permission to delete that role.")
         except discord.HTTPException as e:
             await ctx.send(f"Failed to delete role: {e}")
     except Exception as e:
         await ctx.send(f"Something went wrong: `{e}`")
-    
+
 
 def main():
     bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+
 
 main()

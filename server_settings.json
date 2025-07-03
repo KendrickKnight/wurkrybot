@@ -13,7 +13,12 @@
     "1148156254611578995": {
         "notifications": {
             "ranked": false,
-            "custom": {}
+            "custom": {
+                "ora": {
+                    "map": "ora",
+                    "enabled": true
+                }
+            }
         }
     }
 }
