@@ -1,5 +1,6 @@
 {
-    "searching": false,
+    "ranked": false,
+    "connection": true,
     "lobbies": [
         {
             "name": "Raid Wars Classic ",
@@ -9,6 +10,5 @@
             "running": false,
             "locked": true
         }
-    ],
-    "connection": true
+    ]
 }

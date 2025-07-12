@@ -9,5 +9,12 @@
                 }
             }
         }
+    },
+    "1578972162165309460": {
+       "roles": {
+        "Ranked" : {"map" : null},
+        "Anarking" : {"map" : "Anarking"},
+        "Raidwars" : {"map" : "Raidwars","color":"orange/rgb","img" : "imglink"}
+       } 
     }
 }
