@@ -17,8 +17,39 @@ handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
 intents = discord.Intents.default()
 intents.message_content = True
 
-bot = commands.Bot(command_prefix='!', intents=intents)
+# bot = commands.Bot(command_prefix='!', intents=intents)
+
+
+# def load_data
+
+
+class MyBot(commands.bot):
+
+    def __init__(self,**kwargs):
+        super().__init__(self,**kwargs)
 
 
 
-bot.run(token, log_handler=handler, log_level=logging.DEBUG)
+    async def setup_hook(self):
+        # self.bot.create_task(load_data())
+        await self.load_extension("cogs.c_util")
+
+    
+
+
+bot = MyBot(command_prefix="!")
+
+@bot.event
+async def on_ready():
+    print(f"{bot.user.name}, ready to rumble >:D")
+
+
+@bot.on_guild_join()
+
+
+
+
+
+def main():
+
+    bot.run(token, log_handler=handler, log_level=logging.DEBUG)
