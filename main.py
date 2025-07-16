@@ -12,10 +12,6 @@ token = os.getenv('DISCORD_TOKEN')
 
 handler = logging.FileHandler(filename='discord.log', encoding='utf8', mode='w')
 
-# bot = commands.Bot(command_prefix='!', intents=intents)
-
-# def load_data
-
 
 class MyBot(commands.Bot):
 
@@ -24,19 +20,13 @@ class MyBot(commands.Bot):
         self.data_lobbbies = {}
         self.data_settings = {}
 
-
     async def setup_hook(self):
         # Server settings
         self.data_settings = util.syncData("settings")
         
-        # Lobby settings
+        # Lobby update loop
         self.loop.create_task(self.update_lobbies())
-
-        # setup util for this class children
-        def utilSync(self, name):
-            return 
-        
-        
+              
         # self.bot.create_task(load_data())
         await self.load_extension("cogs.c_util")
         await self.load_extension("cogs.c_test")
@@ -53,6 +43,7 @@ class MyBot(commands.Bot):
             except Exception as e:
                 print(e)
             await asyncio.sleep(5)
+
 
 intents = discord.Intents.default()
 intents.message_content = True

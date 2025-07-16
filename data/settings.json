@@ -1,9 +1,22 @@
 {
-    "1578972162165309460": {
-       "roles": {
-        "tanked" : {"map" : null},
-        "anarking" : {"map" : "Anarking"},
-        "raidwars" : {"map" : "Raidwars","color":"orange/rgb","img" : "imglink"}
-       } 
+    "1578973212165309460": {
+        "notify": true,
+        "roles": {
+            "Ranked": {
+                "map": null
+            },
+            "Anarking": {
+                "map": "Anarking"
+            },
+            "Raidwars": {
+                "map": "Raidwars",
+                "color": "orange/rgb",
+                "img": "imglink"
+            }
+        }
+    },
+    "1148156254611578995": {
+        "notify": true,
+        "roles": {}
     }
 }
