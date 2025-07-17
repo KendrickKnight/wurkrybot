@@ -30,7 +30,7 @@ class MyBot(commands.Bot):
         # self.bot.create_task(load_data())
         await self.load_extension("cogs.c_util")
         await self.load_extension("cogs.c_test")
-        await self.load_extension("cogs.c_bot")
+        await self.load_extension("cogs.c_dev")
         await self.load_extension("cogs.c_lobby")
         await self.load_extension("cogs.c_map_filter")
 

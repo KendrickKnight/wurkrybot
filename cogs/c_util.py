@@ -8,7 +8,7 @@ class Utility(commands.Cog):
 
     @commands.command()
     async def hi(self,ctx):
-        await ctx.send(f"hello {ctx.author.mention}")
+        await ctx.send(f"> hello {ctx.author.mention}")
 
     @commands.command()
     @commands.has_permissions(administrator=True)
@@ -28,11 +28,11 @@ class Utility(commands.Cog):
             util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
             
             if notif_state:
-                msg_notif_state = await ctx.send("Notifications enabled")
+                msg_notif_state = await ctx.send("> Notifications enabled")
                 await asyncio.sleep(5)
                 await msg_notif_state.delete()
             else:
-                msg_notif_state = await ctx.send("Notifications disabled")
+                msg_notif_state = await ctx.send("> Notifications disabled")
                 await asyncio.sleep(5)
                 await msg_notif_state.delete()
             
@@ -43,7 +43,7 @@ class Utility(commands.Cog):
         if guild_id in self.bot.data_settings:
             await ctx.send(self.bot.data_settings[guild_id]["roles"])
         else:
-            await ctx.send("No roles found")
+            await ctx.send("> No roles found")
 
 async def setup(bot):
     await bot.add_cog(Utility(bot))

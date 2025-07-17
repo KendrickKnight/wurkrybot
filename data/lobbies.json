@@ -3,12 +3,76 @@
     "connection": true,
     "lobbies": [
         {
-            "name": "Raid Wars Classic ",
-            "host": "guest_658335",
+            "name": "Raid Wars Classic",
+            "host": "lobbyGent_845733",
             "map": "Raid Wars Classic",
-            "player_count": "[1/2]",
+            "player_count": "[2/2]",
+            "locked": false,
             "running": false,
-            "locked": true
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Anarking",
+            "host": "lobbyGent_689918",
+            "map": "Anarking",
+            "player_count": "[3/6]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Ravaged",
+            "host": "lobbyGent_185667",
+            "map": "Ravaged",
+            "player_count": "[2/2]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "TowerDefense Kingdome",
+            "host": "lobbyGent_924453",
+            "map": "TowerDefense Kingdome",
+            "player_count": "[3/6]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "TowerDefense Kingdome",
+            "host": "lobbyGent_985441",
+            "map": "TowerDefense Kingdome",
+            "player_count": "[6/6]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Rothaga",
+            "host": "lobbyGent_967520",
+            "map": "Rothaga",
+            "player_count": "[2/4]",
+            "locked": false,
+            "running": true,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Woof",
+            "host": "lobbyGent_209289",
+            "map": "Woof",
+            "player_count": "[3/6]",
+            "locked": false,
+            "running": true,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Woof",
+            "host": "lobbyGent_737769",
+            "map": "Woof",
+            "player_count": "[1/6]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
         }
     ]
 }
