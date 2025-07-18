@@ -7,11 +7,7 @@ class Test(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
-    # @commands.command()
-    # async def test_settings(self,ctx):
-    #     await ctx.send(self.bot.data_settings)
 
-    
     @commands.command()
     async def gen_lobby(self,ctx,*args):
         generated_lobbies = []
@@ -60,18 +56,12 @@ class Test(commands.Cog):
             
         self.bot.data_lobbies["lobbies"] = generated_lobbies
         util.syncData("lobbies",cmd=False,inputData=self.bot.data_lobbies)
-        await ctx.send("> Lobbies Generated!")
-        # await ctx.send(generated_lobbies)
+        
+        msg_gen_lobby = await ctx.send("> Lobbies Generated!")
 
-
-    @commands.command()
-    async def test_lob(self,ctx):
-        lobbies = self.bot.data_lobbies["lobbies"]
-        message = "## Lobbies \n"
-        for lobby in lobbies:
-            message += f"> {lobby['name']} {lobby["player_count"]}{" 🔒" if lobby["locked"] else ""}{" 🏃‍♂️" if lobby["running"] else ""} \n"
-
-        await ctx.send(message)
+        await asyncio.sleep(3)
+        await msg_gen_lobby.delete()
+        await ctx.message.delete()
     
     @commands.command()
     async def gen_ranked(self,ctx):
@@ -82,6 +72,7 @@ class Test(commands.Cog):
             msg_ranked = await ctx.send("> no one is seaching for ranked now")
             await asyncio.sleep(5)
             await msg_ranked.delete()
+            await ctx.message.delete()
 
         else: 
             self.bot.data_lobbies["ranked"] = True
@@ -90,6 +81,12 @@ class Test(commands.Cog):
             msg_ranked = await ctx.send("> someone is searching for ranked now")
             await asyncio.sleep(5)
             await msg_ranked.delete()
+            await ctx.message.delete()
+
+    @commands.command()
+    @commands.is_owner()
+    async def debugroles(self, ctx):
+        print(self.bot.data_settings[str(ctx.guild.id)]["roles"].keys())
             
 async def setup(bot):
     await bot.add_cog(Test(bot))

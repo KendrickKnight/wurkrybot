@@ -19,6 +19,7 @@ class MyBot(commands.Bot):
         super().__init__(**kwargs)
         self.data_lobbbies = {}
         self.data_settings = {}
+        self.data_notifs = {}
 
     async def setup_hook(self):
         # Server settings
@@ -32,6 +33,7 @@ class MyBot(commands.Bot):
         await self.load_extension("cogs.c_test")
         await self.load_extension("cogs.c_dev")
         await self.load_extension("cogs.c_lobby")
+        await self.load_extension("cogs.c_events")
         await self.load_extension("cogs.c_map_filter")
 
 
@@ -50,10 +52,6 @@ intents.message_content = True
 
 
 bot = MyBot(command_prefix="!",intents=intents)
-
-@bot.event
-async def on_ready():
-    print(f"{bot.user.name}, ready to rumble >:D")
 
 
 # @bot.on_guild_join()

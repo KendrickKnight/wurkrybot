@@ -45,5 +45,25 @@ class Utility(commands.Cog):
         else:
             await ctx.send("> No roles found")
 
+
+    @commands.command()
+    @commands.has_permissions(administrator=True)
+    async def reset(self,ctx):
+        guild_id = str(ctx.guild.id)
+        if guild_id in self.bot.data_settings:
+            self.bot.data_settings[guild_id] = {
+                "notify":True,
+                "roles":{
+                    "ranked" : {"map": None,
+                                "color": "d62411",
+                                "img": "https://placehold.co/300/2F3136/2F3136",
+                                "emoji": "🏆"}
+                }
+            }
+            util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
+            msg_reset = await ctx.send("> Settings reset")
+            await asyncio.sleep(5)
+            await msg_reset.delete()
+
 async def setup(bot):
     await bot.add_cog(Utility(bot))

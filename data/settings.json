@@ -25,23 +25,23 @@
     "1148156254611578995": {
         "notify": true,
         "roles": {
-            "Ranked": {
+            "ranked": {
                 "map": null,
                 "color": "d62411",
                 "img": "https://placehold.co/300/2F3136/2F3136",
                 "emoji": "\ud83c\udfc6"
             },
-            "Anarking": {
-                "map": "Anarking",
-                "color": "bfff3c",
-                "img": "https://placehold.co/300/2F3136/2F3136",
-                "emoji": "\ud83d\udc7a"
-            },
-            "TowerDefense": {
-                "map": "TowerDefense",
-                "color": "ff2674",
+            "anarking": {
+                "map": "anarking",
+                "color": "ffd100",
                 "img": "https://placehold.co/300/2F3136/2F3136",
                 "emoji": "\ud83e\udd20"
+            },
+            "woof": {
+                "map": "woof",
+                "color": "ff8426",
+                "img": "https://placehold.co/300/2F3136/2F3136",
+                "emoji": "\ud83c\udfa9"
             }
         }
     }

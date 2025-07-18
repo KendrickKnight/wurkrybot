@@ -92,9 +92,10 @@ class MapFilter(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def mapf_add(self,ctx,role_name,map_name = None,color = None,img = None,emoji=None):
         guild_id = str(ctx.guild.id)
-
+        await ctx.message.delete()
+        
         if map_name is None:
-            map_name = role_name
+            map_name = role_name.lower()
         if color is None:
             color = self.colors[random.randint(1,14)]
         if img is None:
@@ -106,8 +107,11 @@ class MapFilter(commands.Cog):
             self.emojis[emoji] = True
             
         try:
-            self.bot.data_settings[guild_id]["roles"][role_name] = {"map":map_name,"color":color,"img":img,"emoji":emoji}
+            self.bot.data_settings[guild_id]["roles"][role_name] = {"map":map_name.lower(),"color":color,"img":img,"emoji":emoji}
             util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
+
+            if role_name not in self.bot.data_notifs[guild_id]:
+                self.bot.data_notifs[guild_id][role_name] = False
 
             await ctx.guild.create_role(name=role_name)
             
@@ -122,15 +126,22 @@ class MapFilter(commands.Cog):
     @commands.has_permissions(administrator=True)
     async def mapf_remove(self,ctx,role_name):
         guild_id = str(ctx.guild.id)
-
+        await ctx.message.delete()
+        
         if role_name in self.bot.data_settings[guild_id]["roles"]:
             guild_role = discord.utils.get(ctx.guild.roles, name=role_name)
+            
+            self.emojis[self.bot.data_settings[guild_id]["roles"][role_name]["emoji"]] = False
+            
+            del self.bot.data_settings[guild_id]["roles"][role_name]
+            util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
+
+            if role_name in self.bot.data_notifs[guild_id]:
+                del self.bot.data_notifs[guild_id][role_name]
+            
             if guild_role:
-                self.emojis[self.bot.data_settings[guild_id]["roles"][role_name]["emoji"]] = False
                 
                 await guild_role.delete()
-                del self.bot.data_settings[guild_id]["roles"][role_name]
-                util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
                 
                 msg_filter_remove = await ctx.send(f"> Map filter removed for {role_name}")
                 await asyncio.sleep(5)
