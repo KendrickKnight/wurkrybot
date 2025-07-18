@@ -39,7 +39,8 @@ class MapFilter(commands.Cog):
 
         }
     
-    @commands.command()
+    @commands.command(brief="[A] Shows all map filters.")
+    @commands.has_permissions(administrator=True)
     async def mapf_view(self,ctx):
             
         guild_id = str(ctx.guild.id)
@@ -88,7 +89,7 @@ class MapFilter(commands.Cog):
             
 
     
-    @commands.command()
+    @commands.command(brief="[A] Adds a map filter.",help="!mapf_add <role_name> <map_name> <color> <img> <emoji>")
     @commands.has_permissions(administrator=True)
     async def mapf_add(self,ctx,role_name,map_name = None,color = None,img = None,emoji=None):
         guild_id = str(ctx.guild.id)
@@ -122,7 +123,7 @@ class MapFilter(commands.Cog):
         except Exception as e:
             await ctx.send(f"error: \n{e}")
 
-    @commands.command()
+    @commands.command(brief="[A] Removes a map filter.",help="!mapf_remove <role_name>")
     @commands.has_permissions(administrator=True)
     async def mapf_remove(self,ctx,role_name):
         guild_id = str(ctx.guild.id)
@@ -153,7 +154,7 @@ class MapFilter(commands.Cog):
             await ctx.send(f"> Map filter for {role_name} does not exist. \nthis command is case sensitive. make sure you are using the correct case.")
 
 
-    @commands.command()
+    @commands.command(brief="[A] Changes the attributes of a map filter. Use if you want to change every attribute!",help="!mapf_att <role_name> <color> <img> <emoji>. ")
     @commands.has_permissions(administrator=True)
     async def mapf_att(self,ctx,role_name,color,img,emoji):
         guild_id = str(ctx.guild.id)
@@ -169,7 +170,7 @@ class MapFilter(commands.Cog):
             await ctx.send(f"> The filter{role_name} doesnt exist")
 
 
-    @commands.command()
+    @commands.command(brief="[A] Changes the color of a map filter.",help="!mapf_color <role_name> <color>")
     @commands.has_permissions(administrator=True)
     async def mapf_color(self,ctx,role_name,color):
         guild_id = str(ctx.guild.id)
@@ -187,7 +188,7 @@ class MapFilter(commands.Cog):
 
 
 
-    @commands.command()
+    @commands.command(brief="[A] Changes the img of a map filter.",help="!mapf_color <role_name> <img>")
     @commands.has_permissions(administrator=True)
     async def mapf_img(self,ctx,role_name,img):
         guild_id = str(ctx.guild.id)
@@ -201,7 +202,7 @@ class MapFilter(commands.Cog):
             await ctx.send(f"> The filter{role_name} doesnt exist")
 
 
-    @commands.command()
+    @commands.command(brief="[A] Changes the emoji of a map filter.",help="!mapf_color <role_name> <emoji>")
     @commands.has_permissions(administrator=True)
     async def mapf_emoji(self,ctx,role_name,emoji):
         guild_id = str(ctx.guild.id)

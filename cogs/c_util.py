@@ -6,18 +6,18 @@ class Utility(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(brief="[M] Says hi and pings you :D")
     async def hi(self,ctx):
         await ctx.send(f"> hello {ctx.author.mention}")
 
-    @commands.command()
+    @commands.command(brief="[A] Deletes all messages in the channel sent in past 14 days")
     @commands.has_permissions(administrator=True)
-    async def purge(self,ctx):
+    async def utl_purge(self,ctx):
         await ctx.channel.purge()
 
-    @commands.command()
+    @commands.command(brief="Turn Notifications on or off")
     @commands.has_permissions(administrator=True)
-    async def notifToggle(self,ctx):
+    async def utl_notifToggle(self,ctx):
         guild_id = str(ctx.guild.id)
         if guild_id in self.bot.data_settings:
             
@@ -36,9 +36,9 @@ class Utility(commands.Cog):
                 await asyncio.sleep(5)
                 await msg_notif_state.delete()
             
-    @commands.command()
+    @commands.command(brief="[A] Displays all roles this server has on settings.json")
     @commands.has_permissions(administrator=True)
-    async def roles(self,ctx):
+    async def utl_roles(self,ctx):
         guild_id = str(ctx.guild.id)
         if guild_id in self.bot.data_settings:
             await ctx.send(self.bot.data_settings[guild_id]["roles"])
@@ -46,9 +46,9 @@ class Utility(commands.Cog):
             await ctx.send("> No roles found")
 
 
-    @commands.command()
+    @commands.command(brief="Resets all settings for this server")
     @commands.has_permissions(administrator=True)
-    async def reset(self,ctx):
+    async def utl_reset(self,ctx):
         guild_id = str(ctx.guild.id)
         if guild_id in self.bot.data_settings:
             self.bot.data_settings[guild_id] = {

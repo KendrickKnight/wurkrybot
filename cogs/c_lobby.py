@@ -100,8 +100,8 @@ class Lobby(commands.Cog):
         
         return embed
 
-    @commands.command()
-    async def lob(self,ctx):
+    @commands.command(brief="[M] Shows all lobbies.")
+    async def lobby(self,ctx):
         filtered_dict = self.sort_lobbies(ctx)
         message = ""
         embeds = []  
@@ -111,16 +111,16 @@ class Lobby(commands.Cog):
         
         await ctx.send(message,embeds=embeds)
 
-    @commands.command()
+    @commands.command(brief="[A] Displays all roles this server has on settings.json")
     @commands.has_permissions(administrator=True)
     async def rls(self,ctx):
         embed = self.msg_embed_role(ctx)
         
         await ctx.send(embed=embed)
         
-    @commands.command()
+    @commands.command(brief="[A] Starts the lobby report.")
     @commands.has_permissions(administrator=True)
-    async def lob_report(self,ctx):
+    async def lob_start(self,ctx):
 
         self.bot.data_notifs[str(ctx.guild.id)]["running"] = True
 
@@ -210,7 +210,8 @@ class Lobby(commands.Cog):
             
         
 
-    @commands.command()
+    @commands.command(brief="[A] Stops the lobby report.")
+    @commands.has_permissions(administrator=True)
     async def lob_stop(self,ctx):
         if "running" in self.bot.data_notifs[str(ctx.guild.id)]:
             self.bot.data_notifs[str(ctx.guild.id)]["running"] = False

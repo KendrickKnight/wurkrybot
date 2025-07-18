@@ -8,14 +8,14 @@ class Dev(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
 
-    @commands.command(name="shutdown")
+    @commands.command(brief="[D] Shuts down the bot (owner only).",hidden=True)
     @commands.is_owner()
     async def dev_shutdown_bot(self, ctx: commands.Context):
         """Shuts down the bot (owner only)."""
         await ctx.send("> Shutting down...")
         await self.bot.close()  # cleanly close the bot
 
-    @commands.command(name="restart")
+    @commands.command(brief="[D] Restarts the bot (owner only).",hidden=True)
     @commands.is_owner()
     async def dev_restart_bot(self, ctx: commands.Context):
         """Restarts the bot (owner only)."""
@@ -29,7 +29,7 @@ class Dev(commands.Cog):
         os.execl(python, python, *sys.argv)
 
     
-    @commands.command()
+    @commands.command(brief="[D] Reloads all cogs (owner only).",hidden=True)
     @commands.is_owner()
     async def dev_reload(self,ctx):
         await self.bot.reload_extension("cogs.c_util")
@@ -41,7 +41,7 @@ class Dev(commands.Cog):
         await asyncio.sleep(5)
         await msg_reload.delete()
         
-    @commands.command()
+    @commands.command(brief="[D] Adds settings for the server (owner only).",hidden=True)
     @commands.is_owner()
     async def dev_add_settings(self,ctx):
         guild = str(ctx.guild.id)
@@ -60,7 +60,7 @@ class Dev(commands.Cog):
             util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
             await ctx.send("> Settings added")
 
-    @commands.command()
+    @commands.command(brief="[D] shows this server's json settings (owner only).",hidden=True)
     @commands.is_owner()
     async def dev_show_settings(self,ctx):
         guild = str(ctx.guild.id)

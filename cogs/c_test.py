@@ -8,7 +8,7 @@ class Test(commands.Cog):
         self.bot = bot
 
 
-    @commands.command()
+    @commands.command(brief="[M] Generate random lobbies!", help="!gen_lobby <map_name> <map_name> <map_name> ... \n basically you can add map name and it will generate lobbies for that map. if you dont add any map name it will generate lobbies for all maps.\n this function will either be removed or hidden on the final version.")
     async def gen_lobby(self,ctx,*args):
         generated_lobbies = []
         
@@ -63,7 +63,7 @@ class Test(commands.Cog):
         await msg_gen_lobby.delete()
         await ctx.message.delete()
     
-    @commands.command()
+    @commands.command(brief="[M] Toggle ranked lobby! like weither someone is searching or not")
     async def gen_ranked(self,ctx):
         if self.bot.data_lobbies["ranked"]:
             self.bot.data_lobbies["ranked"] = False
@@ -83,7 +83,7 @@ class Test(commands.Cog):
             await msg_ranked.delete()
             await ctx.message.delete()
 
-    @commands.command()
+    @commands.command(brief="[D] Debugs the role (owner only).",hidden=True)
     @commands.is_owner()
     async def debugroles(self, ctx):
         print(self.bot.data_settings[str(ctx.guild.id)]["roles"].keys())
