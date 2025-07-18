@@ -7,7 +7,7 @@ import asyncio
 class MapFilter(commands.Cog):
     def __init__(self,bot):
         self.bot = bot
-        self.default_img = "https://placehold.co/300/2F3136/2F3136"
+        self.default_img = "https://dummyimage.com/300x300/131416/131416.png"
         self.colors = {
             1 : "16171a",
             2 : "7f0622",

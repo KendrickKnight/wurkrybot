@@ -67,10 +67,10 @@ class Lobby(commands.Cog):
 
         if role_name.lower() == "lobbies":
             color = "fafdff"
-            img = "https://placehold.co/300/2F3136/2F3136"
+            img = "https://dummyimage.com/300x300/131416/131416.png"
         elif role_name.lower() == "ranked":
             color = "d62411"
-            img = "https://placehold.co/300/2F3136/2F3136"
+            img = "https://dummyimage.com/300x300/131416/131416.png"
         else:
             color = self.bot.data_settings[str(ctx.guild.id)]["roles"][role_name]["color"]
             img = self.bot.data_settings[str(ctx.guild.id)]["roles"][role_name]["img"]
@@ -86,7 +86,7 @@ class Lobby(commands.Cog):
         #     else:
         #         role_name += (" \u2007"+"\u200b\u2007"*rl)
 
-        spacer = "\u2007\u200b" * 35
+        spacer = "\u2007\u200b" * 50
 
         # Embed message itself
         embed = discord.Embed(

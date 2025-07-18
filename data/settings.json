@@ -28,19 +28,19 @@
             "ranked": {
                 "map": null,
                 "color": "d62411",
-                "img": "https://placehold.co/300/2F3136/2F3136",
+                "img": "https://dummyimage.com/300x300/131416/131416.png",
                 "emoji": "\ud83c\udfc6"
             },
             "anarking": {
                 "map": "anarking",
                 "color": "ffd100",
-                "img": "https://placehold.co/300/2F3136/2F3136",
+                "img": "https://dummyimage.com/300x300/131416/131416.png",
                 "emoji": "\ud83e\udd20"
             },
             "woof": {
                 "map": "woof",
                 "color": "ff8426",
-                "img": "https://placehold.co/300/2F3136/2F3136",
+                "img": "https://dummyimage.com/300x300/131416/131416.png",
                 "emoji": "\ud83c\udfa9"
             }
         }
