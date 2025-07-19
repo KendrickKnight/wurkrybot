@@ -9,6 +9,8 @@ class Events(commands.Cog):
     @commands.Cog.listener()
     async def on_ready(self):
         print(f"{self.bot.user.name}, ready to rumble >:D")
+
+        # Ensure notification structure exists
         self.bot.data_notifs = {}
         for guild in self.bot.data_settings:
             self.bot.data_notifs[str(guild)] = {}  # init first
@@ -37,21 +39,40 @@ class Events(commands.Cog):
             for role in self.bot.data_settings[str(guild.id)]["roles"]:
                 self.bot.data_notifs[str(guild.id)][role] = False
 
+    @commands.Cog.listener()
+    async def on_guild_remove(self, guild):
+        if str(guild.id) in self.bot.data_settings:
+            del self.bot.data_settings[str(guild.id)]
+            util.syncData("settings", cmd=False, inputData=self.bot.data_settings)
+
+        if str(guild.id) in self.bot.data_notifs:
+            del self.bot.data_notifs[str(guild.id)]
 
     @commands.Cog.listener()
     async def on_raw_reaction_add(self, payload: discord.RawReactionActionEvent):
-        if payload.member.bot:
+
+        guild = self.bot.get_guild(payload.guild_id)
+        if guild is None:
             return
-    
+
+        # ensure we have a member
+        member = payload.member
+        if member is None:
+            member = await guild.fetch_member(payload.user_id)
+
+        # ignore bots
+        if member.bot:
+            return
+
         guild_id = str(payload.guild_id)
         emoji = str(payload.emoji)
-    
-        for role, role_data in self.bot.data_settings[guild_id]["roles"].items():
+
+        for role_name, role_data in self.bot.data_settings[guild_id]["roles"].items():
+            # match by emoji carefully
             if role_data["emoji"] == emoji:
-                guild = self.bot.get_guild(payload.guild_id)
-                guild_role = discord.utils.get(guild.roles, name=role)
-                member = payload.member
-                if guild_role and member:
+                # better to store role ID in your settings
+                guild_role = discord.utils.get(guild.roles, name=role_name)
+                if guild_role:
                     await member.add_roles(guild_role)
                     break
     

@@ -3,66 +3,75 @@
     "connection": true,
     "lobbies": [
         {
-            "name": "Anarking",
-            "host": "lobbyGent_248206",
-            "map": "Anarking",
-            "player_count": "[4/6]",
-            "locked": false,
-            "running": true,
-            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
-        },
-        {
-            "name": "Anarking",
-            "host": "lobbyGent_806847",
-            "map": "Anarking",
-            "player_count": "[1/6]",
-            "locked": false,
-            "running": true,
-            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
-        },
-        {
-            "name": "TowerDefense Kingdome",
-            "host": "lobbyGent_200476",
-            "map": "TowerDefense Kingdome",
-            "player_count": "[1/6]",
+            "name": "Raid Wars Classic",
+            "host": "lobbyGent_865090",
+            "map": "Raid Wars Classic",
+            "player_count": "[2/2]",
             "locked": false,
             "running": false,
             "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
         },
         {
-            "name": "TowerDefense Kingdome",
-            "host": "lobbyGent_270083",
-            "map": "TowerDefense Kingdome",
-            "player_count": "[6/6]",
+            "name": "Ravaged",
+            "host": "lobbyGent_452960",
+            "map": "Ravaged",
+            "player_count": "[2/2]",
+            "locked": false,
+            "running": false,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Ravaged",
+            "host": "lobbyGent_979697",
+            "map": "Ravaged",
+            "player_count": "[2/2]",
             "locked": true,
             "running": false,
             "invite": null
         },
         {
-            "name": "Rothaga",
-            "host": "lobbyGent_274532",
-            "map": "Rothaga",
-            "player_count": "[4/4]",
+            "name": "Ravaged",
+            "host": "lobbyGent_738057",
+            "map": "Ravaged",
+            "player_count": "[1/2]",
+            "locked": false,
+            "running": true,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "TowerDefense Kingdome",
+            "host": "lobbyGent_363766",
+            "map": "TowerDefense Kingdome",
+            "player_count": "[1/6]",
             "locked": false,
             "running": false,
             "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
         },
         {
             "name": "Woof",
-            "host": "lobbyGent_770821",
+            "host": "lobbyGent_756233",
             "map": "Woof",
-            "player_count": "[3/6]",
+            "player_count": "[5/6]",
+            "locked": false,
+            "running": true,
+            "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
+        },
+        {
+            "name": "Woof",
+            "host": "lobbyGent_895092",
+            "map": "Woof",
+            "player_count": "[4/6]",
             "locked": false,
             "running": false,
             "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
         },
         {
             "name": "Woof",
-            "host": "lobbyGent_769113",
+            "host": "lobbyGent_624945",
             "map": "Woof",
             "player_count": "[2/6]",
             "locked": false,
-            "running": false,
+            "running": true,
             "invite": "<https://www.youtube.com/watch?v=dQw4w9WgXcQ>"
         }
     ]

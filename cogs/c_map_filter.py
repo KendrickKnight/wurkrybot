@@ -57,44 +57,14 @@ class MapFilter(commands.Cog):
         except Exception as e:
             await ctx.send(f"> your server is not setup yet. use wurk_add_settings to add your server. \n{e}")
 
-    # @commands.command()
-    # @commands.has_permissions(administrator=True)
-    # async def mapf_ranked(self,ctx):
-    #     guild_id = str(ctx.guild.id)
-    #     guild_roles = [role.name.lower() for role in ctx.guild.roles]
-    #     role_name = "ranked"
-    #     roles = [role.lower() for role in self.bot.data_settings[guild_id]["roles"]]
-        
-    #     if role_name in roles:
-    #         ranked_state = self.bot.data_settings[guild_id]["roles"][role_name]
-    #         ranked_state = not ranked_state
-    #         util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
-            
-    #         if ranked_state:
-    #             if role_name not in guild_roles:
-    #                 await ctx.guild.create_role(name=role_name)
-    
-    #             msg_ranked_state = await ctx.send("Ranked filter enabled")
-    #             await asyncio.sleep(5)
-    #             await msg_ranked_state.delete()
-                
-    #         else:
-    #             if role_name in guild_roles:
-    #                 guild_role = discord.utils.get(ctx.guild.roles, name="Ranked")
-    #                 await guild_role.delete()
-                    
-    #             msg_ranked_state = await ctx.send("Ranked filter disabled")
-    #             await asyncio.sleep(5)
-    #             await msg_ranked_state.delete()
-            
-
     
     @commands.command(brief="[A] Adds a map filter.",help="!mapf_add <role_name> <map_name> <color> <img> <emoji>")
     @commands.has_permissions(administrator=True)
     async def mapf_add(self,ctx,role_name,map_name = None,color = None,img = None,emoji=None):
         guild_id = str(ctx.guild.id)
         await ctx.message.delete()
-        
+
+        # Gives solution for missing parameters
         if map_name is None:
             map_name = role_name.lower()
         if color is None:
@@ -102,9 +72,13 @@ class MapFilter(commands.Cog):
         if img is None:
             img = self.default_img
         if emoji is None:
-            emoji = random.choice(list(self.emojis.keys()))
-            while self.emojis[emoji]: # this is to make sure that the emoji is not already in use
-                emoji = random.choice(list(self.emojis.keys())) 
+            # makes sure none duplicate emojis
+            available_emojis = [e for e, used in self.emojis.items() if not used]
+
+            if not available_emojis:
+                raise ValueError("No available emojis left!")  # or handle gracefully
+
+            emoji = random.choice(available_emojis)
             self.emojis[emoji] = True
             
         try:

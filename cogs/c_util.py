@@ -1,4 +1,5 @@
 from discord.ext import commands
+import discord
 import asyncio
 import util
 
@@ -49,7 +50,13 @@ class Utility(commands.Cog):
     @commands.command(brief="Resets all settings for this server")
     @commands.has_permissions(administrator=True)
     async def utl_reset(self,ctx):
-        guild_id = str(ctx.guild.id)
+        guild_id = ctx.guild.id
+        guild_roles = guild_id.roles
+
+        for role in self.bot.data_settings[guild_id]["roles"]:
+            if role in guild_roles:
+                await role.delete()
+        
         if guild_id in self.bot.data_settings:
             self.bot.data_settings[guild_id] = {
                 "notify":True,
@@ -61,6 +68,7 @@ class Utility(commands.Cog):
                 }
             }
             util.syncData("settings",cmd=False,inputData=self.bot.data_settings)
+            
             msg_reset = await ctx.send("> Settings reset")
             await asyncio.sleep(5)
             await msg_reset.delete()

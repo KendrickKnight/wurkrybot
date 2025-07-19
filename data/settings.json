@@ -28,20 +28,20 @@
             "ranked": {
                 "map": null,
                 "color": "d62411",
-                "img": "https://dummyimage.com/300x300/131416/131416.png",
+                "img": "https://placehold.co/300/2F3136/2F3136",
                 "emoji": "\ud83c\udfc6"
             },
             "anarking": {
                 "map": "anarking",
-                "color": "ffd100",
+                "color": "bfff3c",
                 "img": "https://dummyimage.com/300x300/131416/131416.png",
                 "emoji": "\ud83e\udd20"
             },
-            "woof": {
+            "Woof": {
                 "map": "woof",
-                "color": "ff8426",
+                "color": "68aed4",
                 "img": "https://dummyimage.com/300x300/131416/131416.png",
-                "emoji": "\ud83c\udfa9"
+                "emoji": "\ud83d\udc7e"
             }
         }
     }

@@ -118,28 +118,49 @@ class Lobby(commands.Cog):
         
         await ctx.send(embed=embed)
         
-    @commands.command(brief="[A] Starts the lobby report.")
+    @commands.command(brief="[A] Purges the channel, and Starts the lobby report.")
     @commands.has_permissions(administrator=True)
     async def lob_start(self,ctx):
+        # Purgin the channel
+        try:
+            def check(msg):
+                return True
 
-        self.bot.data_notifs[str(ctx.guild.id)]["running"] = True
+            await ctx.channel.purge(limit=None, check=check, bulk=True)
+        except Exception as e:
+            await ctx.send(f"error: \n{e}")
+
+        # Check setting roles and server roles
+        guild_roles = [role.name for role in ctx.guild.roles]
+        server_roles = self.bot.data_settings[str(ctx.guild.id)]["roles"]
+        for role in server_roles:
+            if role not in guild_roles:
+                await ctx.guild.create_role(name=role)
 
         
+        # Starting the lobby report
+        self.bot.data_notifs[str(ctx.guild.id)]["running"] = True
+        
 
+        # Role Message
         msg_role = await ctx.send(embed=self.msg_embed_role(ctx))
         for role in self.bot.data_settings[str(ctx.guild.id)]["roles"]:
             await msg_role.add_reaction(self.bot.data_settings[str(ctx.guild.id)]["roles"][role]["emoji"])
         self.bot.data_notifs[str(ctx.guild.id)]["msg_role"] = msg_role.id
 
-
+        # Lobby Message
         filtered_dict = self.sort_lobbies(ctx)
         lobby_embed = [self.msg_embed_lobby(ctx,role,filtered_dict[role]) for role in filtered_dict]  
 
         msg_lobby = await ctx.send(embeds=lobby_embed)
 
+
+        # Lobby report loop
         while True:
+            # Notify settings. if False, wont send notifications
             notify = self.bot.data_settings[str(ctx.guild.id)]["notify"]
-            
+
+            # Lobby report loop's break. if False, will stop the loop
             running = self.bot.data_notifs[str(ctx.guild.id)]["running"]
             if not running:
                 await msg_role.delete()
@@ -148,10 +169,12 @@ class Lobby(commands.Cog):
                 await asyncio.sleep(5)
                 await msg_stop.delete()
                 break
-            
+
+            # Lobby Data
             filtered_dict = self.sort_lobbies(ctx)
             lobby_embed = [self.msg_embed_lobby(ctx,role,filtered_dict[role]) for role in filtered_dict]
 
+            # Message Data & Reactions
             msg_role = await ctx.fetch_message(self.bot.data_notifs[str(ctx.guild.id)]["msg_role"])
             # ✅ Get the set of emojis that *should* be on the message
             allowed_emojis = {
@@ -175,38 +198,41 @@ class Lobby(commands.Cog):
             await msg_lobby.edit(embeds=lobby_embed)
             await msg_role.edit(embed=self.msg_embed_role(ctx))
             await asyncio.sleep(5)
-            
-            notif = ""
-            if notify:
-                for role in filtered_dict:
-                    if role == "lobbies":
-                        continue
-                        
-                    if role == "ranked":
-                        if self.bot.data_lobbies["ranked"] and not self.bot.data_notifs[str(ctx.guild.id)][role]:
-                            notif +=  f"{discord.utils.get(ctx.guild.roles, name="ranked").mention}"
-                            self.bot.data_notifs[str(ctx.guild.id)][role] = True
-                        elif not self.bot.data_lobbies["ranked"]:
-                            self.bot.data_notifs[str(ctx.guild.id)][role] = False
-                        continue
-                    
-                    if filtered_dict[role] != [] and not self.bot.data_notifs[str(ctx.guild.id)][role]:
-                        try:
-                            notif +=  f"{discord.utils.get(ctx.guild.roles, name=role).mention}"
-                            self.bot.data_notifs[str(ctx.guild.id)][role] = True
-                        except AttributeError:
-                            msg_att_err = await ctx.send(f"> Role {role} does not exist in this server")
-                            await asyncio.sleep(5)
-                            await msg_att_err.delete()
-                        except Exception as e:
-                            print(e)
-                    elif filtered_dict[role] == []:
-                        self.bot.data_notifs[str(ctx.guild.id)][role] = False
 
-                if notif != "":
-                    msg_notif = await ctx.send(notif)
-                    await msg_notif.delete()
-                    notif = ""
+            # Notifications
+            if not notify:
+                continue
+                
+            notif = ""
+            for role in filtered_dict:
+                if role == "lobbies":
+                    continue
+                    
+                if role == "ranked":
+                    if self.bot.data_lobbies["ranked"] and not self.bot.data_notifs[str(ctx.guild.id)][role]:
+                        notif +=  f"{discord.utils.get(ctx.guild.roles, name="ranked").mention}"
+                        self.bot.data_notifs[str(ctx.guild.id)][role] = True
+                    elif not self.bot.data_lobbies["ranked"]:
+                        self.bot.data_notifs[str(ctx.guild.id)][role] = False
+                    continue
+                
+                if filtered_dict[role] != [] and not self.bot.data_notifs[str(ctx.guild.id)][role]:
+                    try:
+                        notif +=  f"{discord.utils.get(ctx.guild.roles, name=role).mention}"
+                        self.bot.data_notifs[str(ctx.guild.id)][role] = True
+                    except AttributeError:
+                        msg_att_err = await ctx.send(f"> Role {role} does not exist in this server")
+                        await asyncio.sleep(5)
+                        await msg_att_err.delete()
+                    except Exception as e:
+                        print(e)
+                elif filtered_dict[role] == []:
+                    self.bot.data_notifs[str(ctx.guild.id)][role] = False
+
+            if notif != "":
+                msg_notif = await ctx.send(notif)
+                await msg_notif.delete()
+                notif = ""
             
         
 
