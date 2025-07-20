@@ -1,0 +1,48 @@
+{
+    "1578973212165309460": {
+        "notify": true,
+        "roles": {
+            "ranked": {
+                "map": null,
+                "color": "d62411",
+                "img": "https://placehold.co/300/2F3136/2F3136",
+                "emoji": "\ud83c\udfc6"
+            },
+            "Anarking": {
+                "map": "Anarking",
+                "color": "bfff3c",
+                "img": "https://placehold.co/300/2F3136/2F3136",
+                "emoji": "\ud83d\udc7a"
+            },
+            "Raidwars": {
+                "map": "Raidwars",
+                "color": "orange/rgb",
+                "img": "imglink",
+                "emoji": "\ud83d\udc41\ufe0f"
+            }
+        }
+    },
+    "1148156254611578995": {
+        "notify": true,
+        "roles": {
+            "ranked": {
+                "map": null,
+                "color": "d62411",
+                "img": "https://placehold.co/300/2F3136/2F3136",
+                "emoji": "\ud83c\udfc6"
+            },
+            "anarking": {
+                "map": "anarking",
+                "color": "bfff3c",
+                "img": "https://dummyimage.com/300x300/131416/131416.png",
+                "emoji": "\ud83e\udd20"
+            },
+            "Woof": {
+                "map": "woof",
+                "color": "68aed4",
+                "img": "https://dummyimage.com/300x300/131416/131416.png",
+                "emoji": "\ud83d\udc7e"
+            }
+        }
+    }
+}
