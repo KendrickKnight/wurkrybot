@@ -18,29 +18,30 @@ class MyBot(commands.Bot):
 
     def __init__(self,**kwargs):
         super().__init__(**kwargs)
+
+        # Data
         self.data_lobbbies = {}
         self.data_settings = {}
         self.data_notifs = {}
+        self.data_tournaments = {"pending": {}, "in_progress": {}, "ended": {}}
 
-        self.data_tournaments = {}
+        # Challonge
         self.challonge_api = "https://api.challonge.com/v1/"
         self.challonge_token = os.getenv('CHALLONGE_TOKEN')
         self.challonge_name = "Kendrickknight"
-
-
     
     async def setup_hook(self):
         # Server settings
         self.data_settings = util.syncData("settings")
         
-        # Lobby & Tournament update loop
+        # Update loops
         self.loop.create_task(self.update_lobbies())
         self.loop.create_task(self.update_tournaments())
 
-        # Tournament update loop
+        # Challonge API Credentials
         challonge.set_credentials(self.challonge_name,self.challonge_token)
               
-        # self.bot.create_task(load_data())
+        # Load Cogs
         await self.load_extension("cogs.c_util")
         await self.load_extension("cogs.c_test")
         await self.load_extension("cogs.c_dev")
@@ -61,32 +62,24 @@ class MyBot(commands.Bot):
 
     async def update_tournaments(self):
 
-        # Data_Tournament:
-        #     ID 
-        #     Name 
-        #     Game_name
-        #     URL
-        #     Description
-        #     Tournament_type
-        #     State (pending/canceled/started/finished… whatever is possible)
-        #     Participants_count
-        #     Teams (True/False)
-        #     Team_size_range
-        #     Start_at 
-        #     Registration_type
-        #     Full_challonge_url
-        #     Libe_image_url
-        #     Sign_up_url
-
+        # TODO:
+            # [ ] Sort each tournament based on time
+            # [ ] If teams == True, add teams to the tournament data
         
         while True:
             try:
-                # self.data_tournaments = challonge.tournaments.index()
 
+                
+                if challonge.tournaments.index() == []:
+                    continue
+                
                 for tournament in challonge.tournaments.index():
-                    if tournament["id"] in self.data_tournaments:
-                        continue 
 
+                    for key in self.data_tournaments:
+                        if tournament["id"] in self.data_tournaments[key]:
+                            continue
+
+                    
                     # I dont want every single piece of data, so I will only take what I need
                     data_desired = ["id","name","game_name",
                                     "url","description","tournament_type",
