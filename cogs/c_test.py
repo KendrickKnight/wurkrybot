@@ -87,6 +87,11 @@ class Test(commands.Cog):
     @commands.is_owner()
     async def debugroles(self, ctx):
         print(self.bot.data_settings[str(ctx.guild.id)]["roles"].keys())
-            
+
+
+    @commands.command(brief="[D] Debugs the lobbies (owner only).",hidden=True)
+    @commands.is_owner()
+    async def gen_trn(self, ctx):
+        
 async def setup(bot):
     await bot.add_cog(Test(bot))

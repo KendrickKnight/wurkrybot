@@ -25,6 +25,9 @@ class MyBot(commands.Bot):
         self.data_notifs = {}
         self.data_tournaments = {"pending": {}, "in_progress": {}, "ended": {}}
 
+        # Report List
+        self.report_tournaments = {} # {message_id : (tournament_id, message_date)}
+        
         # Challonge
         self.challonge_api = "https://api.challonge.com/v1/"
         self.challonge_token = os.getenv('CHALLONGE_TOKEN')
@@ -62,14 +65,30 @@ class MyBot(commands.Bot):
 
     async def update_tournaments(self):
 
-        # TODO:
-            # [ ] Sort each tournament based on time
-            # [ ] If teams == True, add teams to the tournament data
+        # TODO: Update_tournaments Loop
+            # Receiving Data from Challonge
+                # Log in to Challonge
+                # Get all tournaments
+                # Get necessary data from each tournament
+        
+            # Sorting Data
+                # Sort by state
+            
+            # Storing Data
+                # Self.data_tournaments_pending : store all pending tournaments
+        
+            # Prune Report List
+                # 1. Prune by date
+                # 2. Prune if message is deleted / doesnt exist
+        
+            # Edit messages in the report list
+                # Edit message 
+
+        
+            # Sleep(5)
         
         while True:
-            try:
-
-                
+            try:                 
                 if challonge.tournaments.index() == []:
                     continue
                 
