@@ -87,6 +87,10 @@ class Lobby(commands.Cog):
         #         role_name += (" \u2007"+"\u200b\u2007"*rl)
 
         spacer = "\u2007\u200b" * 50
+        spacer_wall = "_|_" * 25
+        spacer_diamond = "<>" * 25
+        spacer_waves = "~" * 50
+        spacer_arrow = ">>------> " * 5
 
         # Embed message itself
         embed = discord.Embed(
@@ -95,7 +99,7 @@ class Lobby(commands.Cog):
             colour=discord.Colour(int(color, 16))
         )
         embed.set_thumbnail(url=img)
-        embed.set_footer(text=f"{spacer}",icon_url=ctx.bot.user.display_avatar.url)
+        embed.set_footer(text=f"{spacer_diamond}",icon_url=ctx.bot.user.display_avatar.url)
         
         
         return embed
