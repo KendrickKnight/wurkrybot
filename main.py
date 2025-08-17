@@ -66,15 +66,23 @@ class MyBot(commands.Bot):
     async def update_tournaments(self):
 
         # TODO: Update_tournaments Loop
-            # Receiving Data from Challonge
+
+            # Check for updates
                 # Log in to Challonge
-                # Get all tournaments
-                # Get necessary data from each tournament
-        
-            # Sorting Data
-                # Sort by state
+                # Check for updates
+                    # if a tournament is not in the data_tournaments --> add it
+                    # elif a tournament but state is not "pending" --> check for state change 
+                    # else (meaning state is "pending") --> full check
+                        # tournament participants
+                        # tournament state
+                        # tournament date
+                        # tournament name
+                # Return a list of tournaments and their changes
+
+            # if update check list is empty --> sleep(5) --> continue
             
-            # Storing Data
+            # Store & Sort the data 
+                # Sort by state
                 # Self.data_tournaments_pending : store all pending tournaments
         
             # Prune Report List
@@ -86,10 +94,24 @@ class MyBot(commands.Bot):
 
         
             # Sleep(5)
+
+        def check_for_updates():
+            pass
+        
+        def update_data():
+            pass
+
+        def update_tournament_report_list():
+            pass
+
+        def update_messages():
+            pass
+
         
         while True:
             try:                 
                 if challonge.tournaments.index() == []:
+                    await asyncio.sleep(5)
                     continue
                 
                 for tournament in challonge.tournaments.index():
