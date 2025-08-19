@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 import os
 import asyncio
 import challonge
+import datetime as dt
 
 import util
 
@@ -23,10 +24,15 @@ class MyBot(commands.Bot):
         self.data_lobbbies = {}
         self.data_settings = {}
         self.data_notifs = {}
-        self.data_tournaments = {"pending": {}, "in_progress": {}, "ended": {}}
+        self.data_tournaments = {}
+        self.data_tournaments_pending = {}
 
         # Report List
-        self.report_tournaments = {} # {message_id : (tournament_id, message_date)}
+
+        # {message_id : (channel_id, message_date, Tournament_id)}
+        self.report_tournaments_permanent = {} # deletes when message is removed/deleted
+        self.report_tournaments_temp = {} # deletes after 2 weeks
+
         
         # Challonge
         self.challonge_api = "https://api.challonge.com/v1/"
@@ -79,11 +85,7 @@ class MyBot(commands.Bot):
                         # tournament name
                 # Return a list of tournaments and their changes
 
-            # if update check list is empty --> sleep(5) --> continue
-            
-            # Store & Sort the data 
-                # Sort by state
-                # Self.data_tournaments_pending : store all pending tournaments
+            # if update check list is empty --> continue
         
             # Prune Report List
                 # 1. Prune by date
@@ -95,14 +97,77 @@ class MyBot(commands.Bot):
         
             # Sleep(5)
 
-        def check_for_updates():
-            pass
-        
-        def update_data():
-            pass
 
-        def update_tournament_report_list():
-            pass
+        # Update data 
+
+        def get_full_desired_data(tournament):
+            #TODO: get winner for finished tournaments
+            data_desired = ["id","name","game_name",
+                "url","description","tournament_type",
+                "state","participants_count","teams",
+                "team_size_range","start_at","registration_type",
+                "full_challonge_url","live_image_url","sign_up_url"]
+            data_tournament = {}
+
+            for key in data_desired:
+                data_tournament[tournament["id"]] = tournament[key]
+
+            return data_tournament
+                
+        def check_for_updates():
+            update_list = []
+            if challonge.tournaments.index() == []:
+                return []
+
+            for tournament in challonge.tournaments.index():
+                # if tournament is not in the data_tournaments --> add it
+                if tournament["id"] not in self.data_tournaments:
+                    update_list.append(get_full_desired_data(tournament))
+
+                # elif a tournament but state is not "pending" --> check for state change
+                elif self.data_tournaments[tournament["id"]]["state"] != "pending":
+                    if self.data_tournaments[tournament["id"]]["state"] != tournament["state"]:
+                        update_list.append({"id":tournament["id"],"state":tournament["state"]})
+
+                # else (meaning state is "pending") --> replace the data
+                else:
+                    update_list.append(get_full_desired_data(tournament))
+                        
+            return update_list
+        
+        def update_data(update_list):
+            for tournament in update_list:
+                self.data_tournaments[tournament["id"]] = tournament
+                if tournament["state"] == "pending":
+                    self.data_tournaments_pending[tournament["id"]] = tournament
+                
+
+        # Pruning tournament report list
+        
+
+        def is_prune_time(message_date: dt.datetime) -> bool:
+            today = dt.datetime.utcnow()  # use UTC
+            return (today - message_date) >= dt.timedelta(weeks=2)
+
+        async def msg_exists(bot, msg, msg_id):
+            channel = bot.get_channel(msg[0])
+            try:
+                await channel.fetch_message(msg_id)
+                return True   # still exists
+            except discord.NotFound:
+                return False  # deleted
+            except discord.Forbidden:
+                return None   # bot can't access channel
+            except discord.HTTPException:
+                return None   # API/network error
+        
+        def prune_tournament_report_list():
+            for msg, data in self.report_tournaments_temp.items():
+                if not msg_exists(self, data, msg):
+                    del self.report_tournaments_temp[msg]
+                if is_prune_time(self.report_tournaments_temp[msg][1]):
+                    del self.report_tournaments_temp[msg]
+            
 
         def update_messages():
             pass
